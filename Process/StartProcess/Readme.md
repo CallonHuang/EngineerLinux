@@ -8,7 +8,7 @@
 
 这三种方式在工程应用上都比较常见，但很多时候启动自己想要的进程后往往会增加一个`sh`进程，在嵌入式系统上有时候会显示为全名`sh -c xxx`。这种情况下，无论是资源还是调度都是存在浪费的。若你还具有强迫症，发现无论如何都消除不了它，那么这无疑更是令人抓狂的。
 
-在code文件夹中，已经给出了相关的例程代码，使用`sh build.sh`即可完成编译。除此之外，还提供了glibc中关于`system`和`popen`的源码[^ 1]。
+在code文件夹中，已经给出了相关的例程代码，使用`sh build.sh`即可完成编译。除此之外，还提供了glibc中关于`system`和`popen`的源码（glibc的下载地址http://ftp.gnu.org/pub/gnu/glibc/，这里给出了两个版本，当前自己运行的ubuntu是2.27的，而最新的是2.32，两者实现是有差异的，感兴趣可以继续深挖下）。
 
 ```C
 int main()
@@ -28,7 +28,7 @@ int main()
 }
 ```
 
-上面给出的是父进程代码的截取，对应main.c，从代码上看，这就是一些再正常不过的启动进程的函数[^ 2]，而启动的进程就是process.c编译出的process进程，代码结构更为简单：
+上面给出的是父进程代码的截取，对应main.c，从代码上看，这就是一些再正常不过的启动进程的函数（CreateProcess函数是经过封装的，内部即为fork+execl实现），而启动的进程就是process.c编译出的process进程，代码结构更为简单：
 
 ```C
 while (1) {
@@ -147,13 +147,7 @@ if ((pid = fork()) < 0) {
 ```
 
 如上代码就是main.c中`CreateProcess`启动进程的部分，这里其实不管是否调用`waitpid`，都会产生`sh`这个进程，但是若不调用则后果将来得更严重。如下为一种可能的场景：
-
-```sequence
-  WEB端->设备端: 开启ssh
-  设备端-->设备端: 启动dropbear进程（NO_WAIT）
-  WEB端->设备端: 关闭ssh
-  设备端-->设备端: kill $(pidof dropbear)
-```
+![Image text](https://github.com/CallonHuang/EngineerLinux/raw/master/img-storage/startProcess_1.PNG)
 
 在类似这种场景下，若`dropbear`的启动是NO WAIT的，那么在ssh关闭即杀掉`dropbear`进程后，sh将转变为僵尸进程，这意味着该进程虽然不再会被调度，但是在内核的角度其内核保留的资源依然存在（虽然很少）。在linux中，若父进程不调用`wait`对子进程进行回收，那么子进程结束后，就会转变为僵尸进程而依然会在`ps`命令中显示，且标注为`defunct`。
 
@@ -198,7 +192,3 @@ callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$
 - 忽略`SIGINT`和`SIGQUIT`信号：其目的在于，`CreateProcess`的执行命令可能是交互命令（`如ed程序`），以及`CreateProcess`的调用者在命令执行期间放弃了对程序的控制，所以`CreateProcess`调用者不应该接收`SIGINT`和`SIGQUIT`，而应由子进程接收。
 
 
-
-[^ 1]: glibc的下载地址http://ftp.gnu.org/pub/gnu/glibc/，这里给出了两个版本，当前自己运行的ubuntu是2.27的，而最新的是2.32，两者实现是有差异的，感兴趣可以继续深挖下
-
-[^ 2]: CreateProcess函数是经过封装的，内部即为fork+execl实现
