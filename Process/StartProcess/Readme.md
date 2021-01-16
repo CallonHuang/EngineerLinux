@@ -40,15 +40,15 @@ while (1) {
 仅仅是循环打印，下面不妨走一遍运行：
 
 ```c
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ ps
+$ ps
   PID TTY          TIME CMD
  1595 tty1     00:00:03 bash
  9386 tty1     00:00:00 ps
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ sh build.sh
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ ./main &
+$ sh build.sh
+$ ./main &
 [1] 9399
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ Process is running...
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ ps
+Process is running...
+$ ps
   PID TTY          TIME CMD
  1595 tty1     00:00:03 bash
  9399 tty1     00:00:00 main
@@ -61,7 +61,7 @@ callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$
 
 ```c
 ------------------------------------shell-1----------------------------------------------
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ strace -f ./main
+$ strace -f ./main
 execve("./main", ["./main"], 0x7fffff84b1f8 /* 19 vars */) = 0
 ...
 clone(strace: Process 9450 attached
@@ -84,7 +84,7 @@ child_stack=NULL, flags=CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID|SIGCHLD, child_t
 [pid  9451] nanosleep({tv_sec=10, tv_nsec=0}, 0x7fffc114bb90) = 0
 [pid  9451] write(1, "Process is running...\n", 22Process is running...
 ------------------------------------shell-2----------------------------------------------
-callon@USER-20200329HY:~$ top
+$ top
 ...
 9449 callon    20   0   10416    444    424 S   0.0  0.0   0:00.00 main
 9450 callon    20   0   10668    672    644 S   0.0  0.0   0:00.00 sh
@@ -153,26 +153,25 @@ if ((pid = fork()) < 0) {
 在类似这种场景下，若`dropbear`的启动是NO WAIT的，那么在ssh关闭即杀掉`dropbear`进程后，sh将转变为僵尸进程，这意味着该进程虽然不再会被调度，但是在内核的角度其内核保留的资源依然存在（虽然很少）。在linux中，若父进程不调用`wait`对子进程进行回收，那么子进程结束后，就会转变为僵尸进程而依然会在`ps`命令中显示，且标注为`defunct`。
 
 ```c
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ sh build.sh
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ ./main &
+$ sh build.sh
+$ ./main &
 [1] 9496
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ Process is running...
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ ps
+Process is running...
+$ ps
   PID TTY          TIME CMD
  1595 tty1     00:00:04 bash
  9496 tty1     00:00:01 main
  9497 tty1     00:00:00 sh
  9498 tty1     00:00:00 process
  9499 tty1     00:00:00 ps
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ kill 9498
+$ kill 9498
 Terminated
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ ps
+$ ps
   PID TTY          TIME CMD
  1595 tty1     00:00:04 bash
  9496 tty1     00:00:08 main
  9497 tty1     00:00:00 sh <defunct>
  9500 tty1     00:00:00 ps
-callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$
 ```
 
 
