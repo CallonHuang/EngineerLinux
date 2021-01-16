@@ -8,7 +8,7 @@
 
 这三种方式在工程应用上都比较常见，但很多时候启动自己想要的进程后往往会增加一个`sh`进程，在嵌入式系统上有时候会显示为全名`sh -c xxx`。这种情况下，无论是资源还是调度都是存在浪费的。若你还具有强迫症，发现无论如何都消除不了它，那么这无疑更是令人抓狂的。
 
-在code文件夹中，已经给出了相关的例程代码，使用`sh build.sh`即可完成编译。除此之外，还提供了glibc中关于`system`和`popen`的源码（glibc的下载地址http://ftp.gnu.org/pub/gnu/glibc/，这里给出了两个版本，当前自己运行的ubuntu是2.27的，而最新的是2.32，两者实现是有差异的，感兴趣可以继续深挖下）。
+在code文件夹中，已经给出了相关的例程代码，使用`sh build.sh`即可完成编译。除此之外，还提供了glibc中关于`system`和`popen`的源码（glibc的下载地址 http://ftp.gnu.org/pub/gnu/glibc/ ，这里给出了两个版本，当前自己运行的ubuntu是2.27的，而最新的是2.32，两者实现是有差异的，感兴趣可以继续深挖下）。
 
 ```C
 int main()
@@ -39,7 +39,7 @@ while (1) {
 
 仅仅是循环打印，下面不妨走一遍运行：
 
-```SHEL
+```c
 callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ ps
   PID TTY          TIME CMD
  1595 tty1     00:00:03 bash
@@ -59,7 +59,7 @@ callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$
 
 正如标题所说的，确实比预期的多出现了一个`sh`进程，实际上走读相关的源码就可以知道，出现它的原因在于，不管是上面提到的哪种启动进程方式，都会调用`sh -c`去拉起进程（使用`-c`能将字符串完整执行，若字符串中包含多个命令也能逐一进行解析并执行）。而且通过`kill $(pidof process)`不难发现，在`process`结束后，`sh`也将不复存在。但是，已经拉起来process的情况下是不再需要`sh`的，为何它依然存在？好在linux上有`strace`工具可以对内部逻辑进行进一步的窥探：
 
-```SHELL
+```c
 ------------------------------------shell-1----------------------------------------------
 callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ strace -f ./main
 execve("./main", ["./main"], 0x7fffff84b1f8 /* 19 vars */) = 0
@@ -147,11 +147,12 @@ if ((pid = fork()) < 0) {
 ```
 
 如上代码就是main.c中`CreateProcess`启动进程的部分，这里其实不管是否调用`waitpid`，都会产生`sh`这个进程，但是若不调用则后果将来得更严重。如下为一种可能的场景：
+
 ![Image text](https://github.com/CallonHuang/EngineerLinux/raw/master/img-storage/startProcess_1.PNG)
 
 在类似这种场景下，若`dropbear`的启动是NO WAIT的，那么在ssh关闭即杀掉`dropbear`进程后，sh将转变为僵尸进程，这意味着该进程虽然不再会被调度，但是在内核的角度其内核保留的资源依然存在（虽然很少）。在linux中，若父进程不调用`wait`对子进程进行回收，那么子进程结束后，就会转变为僵尸进程而依然会在`ps`命令中显示，且标注为`defunct`。
 
-```SHELL
+```c
 callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ sh build.sh
 callon@USER-20200329HY:/mnt/d/linux/git/EngineerLinux/Process/StartProcess/code$ ./main &
 [1] 9496
