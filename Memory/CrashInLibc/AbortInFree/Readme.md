@@ -76,11 +76,11 @@ struct malloc_chunk {
 
 需要注意的是，chunk的head从代码上可以看到，总共只有`sizeof(size_t)`的大小，但它却同时记录了flag和size，这是因为每个chunk大小都要求是8字节对齐的，因此它最低的三个bit可以用来存储三个flag：
 
-flag包含的bits|含义
---|:
-bit2（对本主题不是很关键）|1-主分配区（main_arena）<br>0-非主分配区
-bit1|1-使用`mmap`从进程映射区分配<br>0-不是`mmap`分配，若chunk空闲，则该状态不存在
-bit0|1-前一个chunk正在使用<br>0-前一个chunk为空闲
+|flag包含的bits|含义|
+|--|--|
+|bit2（对本主题不是很关键）|1-主分配区（main_arena）<br>0-非主分配区|
+|bit1|1-使用`mmap`从进程映射区分配<br>0-不是`mmap`分配，若chunk空闲，则该状态不存在|
+|bit0|1-前一个chunk正在使用<br>0-前一个chunk为空闲|
 
 到这，前面程序的崩溃问题就可以得到解答了：
 
