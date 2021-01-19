@@ -59,7 +59,7 @@ main: malloc.c:2401: sysmalloc: Assertion `(old_top == initial_top (av) && old_s
 
 图中左侧依然是linux进程的虚拟内存分布图，这次将图中的堆区完全放大以反应在libc内存管理中的另一个概念top chunk。这里同时假设堆区只分配了七个chunk，其中浅色填充的chunk就代表的是已经通过`malloc`已经分配给程序使用的内存块，深色填充的chunk代表已经通过`free`归还给libc的。
 
-就和top chunk这个名词一样，它是一种特殊的chunk，位于堆区的顶部（实际上不仅只有堆区有top chunk，匿名映射区的管理也有，不过不妨碍这个概念的讲解，且个人认为先用堆区进行理解更佳）。前一小节提到，libc在每次libc内部的缓存不够时，都会通过调用`sysmalloc`函数从操作系统”批发“一大块内存进行管理和分配，top chunk则是这管理的一环：
+就和top chunk这个名词一样，它是一种特殊的chunk，位于堆区的顶部（实际上不仅只有堆区有top chunk，匿名映射区的管理也有，不过不妨碍这个概念的讲解，且个人认为先用堆区进行理解更佳）。前一小节提到，libc在每次libc内部的缓存不够时，都会通过调用`sysmalloc`函数（对于堆区底层是`brk`系统调用，对于匿名映射区底层是`mmap`系统调用）从操作系统”批发“一大块内存进行管理和分配，top chunk则是这管理的一环：
 
 - 在获取到“批发”而来的内存时，它会将”批发“而来的一大块内存全部先作为top chunk，然后分配时则是意味着从top chunk中切出对应大小的块分配给应用程序
 - 对于堆区，若程序调用`free`归还的chunk与top chunk相邻，则会被合并进top chunk（实际上当chunk被放入fastbin中是不会被合并的，但是只限于单一的这种可能，在fastbin未讲解前不妨这么理解），当top chunk过大时，还会将其切去一部分大小，切出来的部分则归还给操作系统
@@ -76,7 +76,7 @@ sbrk(0) = 0x7fffc137c000, tmp = 0x7fffc135b470, ttmp = 0x7fffc135b880
 
 在程序完全未分配内存之前，`sbrk(0)`的地址为0x7fffc135b000，当第一次malloc调用后，`sbrk(0)`的地址调整为了0x7fffc137c000，这个调整就对应了前面提到的，通过调用`sysmalloc`函数问操作系统“批发”内存的过程。
 
-对于堆区，`首次调整的大小size=ALIGN_UP(首次申请大小+2*sizeof(size_t)+默认128K,4K)`，通过程序可以看到，首次申请的大小为1024，那么前面的结果向上4K对其就是132K，刚好是两次`sbrk(0)`地址的差值。再来看`tmp`和`ttmp`的地址，不难发现由于都是从top chunk中切割而来，所以地址是连续的，所以相差0x410=1024+size(size_t)，即chunk head的大小。
+对于堆区，`首次调整的大小size=ALIGN_UP(首次申请大小+2*sizeof(size_t)+默认128K,4K)`，通过程序可以看到，首次申请的大小为1024，那么前面的结果向上4K对其就是132K，刚好是两次`sbrk(0)`地址的差值。再来看`tmp`和`ttmp`的地址，不难发现由于都是从top chunk中切割而来，所以地址是连续的，所以相差0x410=1024+`size(size_t)`，其中`size(size_t)`就是chunk head的大小。
 
 到这，再来翻译一下之前的报错`sysmalloc: Assertion ``(old_top == initial_top (av) && old_size == 0) || ((unsigned long) (old_size) >= MINSIZE && prev_inuse (old_top) && ((unsigned long) old_end & (pagesize - 1)) == 0)' failed.`，它是在向系统“批发”内存之前的内部校验：
 
