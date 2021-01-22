@@ -191,4 +191,6 @@ $ ps
 
 - 忽略`SIGINT`和`SIGQUIT`信号：其目的在于，`CreateProcess`的执行命令可能是交互命令（`如ed程序`），以及`CreateProcess`的调用者在命令执行期间放弃了对程序的控制，所以`CreateProcess`调用者不应该接收`SIGINT`和`SIGQUIT`，而应由子进程接收。
 
+  
 
+有相关需要封装启动进程类似“轮子”的小伙伴，不妨研究下glib库（下载地址为 https://ftp.acc.umu.se/pub/GNOME/sources/glib/ ），虽然网上对它褒贬不一，但不妨碍肯定它是一个非常优秀的C语言库，它将C语言与面向对象思想结合地非常完美，很值得研究和借鉴。对于启动进程而言，它封装的`g_spawn_async`既考虑到了信号处理的方方面面，又提供了本节所述的后台运行方式，可以大大降低自己封装的工作量和风险。
