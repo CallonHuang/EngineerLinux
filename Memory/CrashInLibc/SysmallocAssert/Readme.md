@@ -62,7 +62,7 @@ main: malloc.c:2401: sysmalloc: Assertion `(old_top == initial_top (av) && old_s
 就和top chunk这个名词一样，它是一种特殊的chunk，位于堆区的顶部（实际上不仅只有堆区有top chunk，匿名映射区的管理也有，不过不妨碍这个概念的讲解，且个人认为先用堆区进行理解更佳）。前一小节提到，libc在每次libc内部的缓存不够时，都会通过调用`sysmalloc`函数（对于堆区底层是`brk`系统调用，对于匿名映射区底层是`mmap`系统调用）从操作系统”批发“一大块内存进行管理和分配，top chunk则是这管理的一环：
 
 - 在获取到“批发”而来的内存时，它会将”批发“而来的一大块内存全部先作为top chunk，然后分配时则是意味着从top chunk中切出对应大小的块分配给应用程序
-- 对于堆区，若程序调用`free`归还的chunk与top chunk相邻，则会被合并进top chunk（实际上当chunk被放入fastbin中是不会被合并的，但是只限于单一的这种可能，在fastbin未讲解前不妨这么理解），当top chunk过大时，还会将其切去一部分大小，切出来的部分则归还给操作系统
+- 对于堆区，若程序调用`free`归还的chunk与top chunk相邻，则会被合并进top chunk（实际上当chunk被放入fast bin中是不会被合并的，但是只限于单一的这种可能，在fast bin这个概念未讲解前不妨先这么理解），当top chunk过大时，还会将其切去一部分大小，切出来的部分则归还给操作系统
 
 接下来，再通过程序来找下top chunk的影子。若本小节的程序实例未放开`SYSMALLOC_ASSERT`的宏定义，那么你可能得到如下结果：
 
