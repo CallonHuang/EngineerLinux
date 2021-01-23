@@ -54,7 +54,7 @@ double free or corruption (!prev)
 
 图中左侧画出了linux进程的虚拟内存分布图，通过将图中的一小段放大，这样更能反映出接下来要讨论的内存粒度，右侧放大的图即为本次要讨论的重点。
 
-右侧图中可以看到chunk这一名词，它可以简单地理解为分配给程序使用的内存块，每当程序调用`malloc`将从libc管理的内存中拿走合适的一个chunk，而程序调用`free`时将归还给libc这一块内存，其中浅色填充的chunk就代表的是已经通过`malloc`已经分配给程序使用的内存块，深色填充的chunk代表已经通过`free`归还给libc的。不难看到，每个空闲chunk的组织是通过将同样大小的chunk串联成链表来实现（不但如此，这还是一种精妙的内存复用，值得借鉴）。此外，每个chunk分为head和body，即使通过`malloc`从libc拿到内存，由于返回给程序的指针也只是body的起始位置，因而应用程序中只会使用body部分，而chunk的head部分是专门为libc内部管理服务的。图中也通过文字展示了，每一个chunk的head记录了这个chunk的size和一些flag。
+右侧图中可以看到chunk这一名词，它可以简单地理解为分配给程序使用的内存块，每当程序调用`malloc`将从libc管理的内存中拿走合适的一个chunk，而程序调用`free`时将归还给libc这一块内存，其中浅色填充的chunk就代表的是已经通过`malloc`已经分配给程序使用的内存块，深色填充的chunk代表已经通过`free`归还给libc的。不难看到，每个空闲chunk的组织是通过将同样大小的chunk串联成链表来实现（`fd`和`bk`成员就是用于链表组织，不但如此，这还是一种精妙的内存复用，值得借鉴）。此外，每个chunk分为head和body，即使通过`malloc`从libc拿到内存，由于返回给程序的指针也只是body的起始位置，因而应用程序中只会使用body部分，而chunk的head部分是专门为libc内部管理服务的。图中也通过文字展示了，每一个chunk的head记录了这个chunk的size和一些flag。
 
 接下来不妨看下libc中chunk真正对应的代码表示：
 
