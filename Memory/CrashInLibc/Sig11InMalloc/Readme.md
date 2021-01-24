@@ -115,17 +115,7 @@ unsorted_chunks (av)->bk = bck;   //指针操作，想要从unsorted bin中移�
 bck->fd = unsorted_chunks (av);   //第3789行，访问了空指针崩溃
 ```
 
-glibc最新的2.32版本在这之前进行了判断：
 
-```c
-/* remove from unsorted list */
-if (__glibc_unlikely (bck->fd != victim))
-  malloc_printerr ("malloc(): corrupted unsorted chunks 3");
-unsorted_chunks (av)->bk = bck;
-bck->fd = unsorted_chunks (av);
-```
-
-所以2.32版本可能问题不会一样，而是抛出`malloc(): corrupted unsorted chunks 3`的signal 6异常。
 
 
 
