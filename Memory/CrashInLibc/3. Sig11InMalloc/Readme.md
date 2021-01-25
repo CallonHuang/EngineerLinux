@@ -21,7 +21,7 @@ struct malloc_chunk {
   struct malloc_chunk* fd_nextsize; /* double links -- used only if free. */
   struct malloc_chunk* bk_nextsize;
 };
-#define SIG11_IN_MALLOC
+
 int main()
 {
     void *tmp[2]; 
@@ -72,8 +72,6 @@ _int_malloc (av=av@entry=0x7fffff3ebc40 <main_arena>, bytes=bytes@entry=2048) at
 #1  0x00007fffff0971cc in __GI___libc_malloc (bytes=2048) at malloc.c:3067
 #2  0x00000000080007c5 in main () at main.c:35
 ```
-
-此处gdb指出的main函数的第35行是`return`前的`malloc`，因为是放开了`SIG11_IN_MALLOC`的，所以行号会有一行的偏差，请不要在意。
 
 从前面两小节已经了解到了libc内存管理中大大小小的概念，也知道了chunk是由链表组织起来的，但是究竟有几个链表？除了大小不同还有什么别的含义吗？
 
