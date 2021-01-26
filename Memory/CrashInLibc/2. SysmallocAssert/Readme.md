@@ -86,7 +86,7 @@ sbrk(0) = 0x7fffc137c000, tmp = 0x7fffc135b470, ttmp = 0x7fffc135b880
 
 
 
-# 补充的知识
+## 补充的知识
 
 在libc的管理过程中，除了top chunk，还有其他的一些必须知晓的概念：
 
