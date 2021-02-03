@@ -32,11 +32,21 @@ int main()
     pthread_t thread[8];
     void *ret = NULL;
     const unsigned int stacksize[8] = {0, 128*1024, 512*1024, 2048*1024, 128*1024, 256*1024, 1024*1024, 0};
+#ifndef STACK_LEAK
     for (i = 0; i < 4; i++) {
+#else
+    pthread_create(&thread[0], NULL, start_routine, NULL);
+    printf("thread[%ld] created with stacksize[0].\n", thread[0]);
+    for (i = 1; i < 4; i++) {
+#endif
     	pthread_spawn(&thread[i], stacksize[i], start_routine, NULL);
     	printf("thread[%ld] created with stacksize[%u].\n", thread[i], (unsigned int)(stacksize[i] & ~(0x1L)));
     }
+#ifndef STACK_LEAK
     for (i = 0; i < 4; i++)
+#else
+    for (i = 1; i < 4; i++)
+#endif
     	pthread_join(thread[i], &ret);
     printf("------------------------------------------------------\n");
     for (; i < 7; i++) {

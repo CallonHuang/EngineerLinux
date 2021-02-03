@@ -148,11 +148,21 @@ int main()
     pthread_t thread[8];
     void *ret = NULL;
     const unsigned int stacksize[8] = {0, 128*1024, 512*1024, 2048*1024, 128*1024, 256*1024, 1024*1024, 0};
+#ifndef STACK_LEAK
     for (i = 0; i < 4; i++) {
+#else
+    pthread_create(&thread[0], NULL, start_routine, NULL);
+    printf("thread[%ld] created with stacksize[0].\n", thread[0]);
+    for (i = 1; i < 4; i++) {
+#endif
     	pthread_spawn(&thread[i], stacksize[i], start_routine, NULL);
     	printf("thread[%ld] created with stacksize[%u].\n", thread[i], (unsigned int)(stacksize[i] & ~(0x1L)));
     }
+#ifndef STACK_LEAK
     for (i = 0; i < 4; i++)
+#else
+    for (i = 1; i < 4; i++)
+#endif
     	pthread_join(thread[i], &ret);
     printf("------------------------------------------------------\n");
     for (; i < 7; i++) {
@@ -199,6 +209,32 @@ thread[139944148141824] will finished: stackaddr[0x7f4748bd1000] stacksize[83886
 4. 再次申请的1MB被扩充为了2MB，且地址和上次申请的2MB也相同；
 
 这四个现象无一不说明着线程栈缓存的存在，通过源码就更容易看出这一机制了（code/glibc-2.32/补充知识点1相关源码 文件夹的allocatestack.c），主要涉及`get_cached_stack`函数（申请）和`queue_stack`函数（释放）。当然这种缓存也不是无止境的，默认情况下当缓存超过`stack_cache_maxsize`（40MB）时将通过`munmap`归还给操作系统。
+
+而当某一个线程栈没有join回收会怎样呢？上面的代码放开`STACK_LEAK`宏定义后，运行将得到如下结果：
+
+```c
+$ gcc test_stack_cache.c -o test -lpthread
+$ ./test
+thread[140470835283712] created with stacksize[0].
+thread[140470835283712] will finished: stackaddr[0x7fc1e9bd1000] stacksize[8388608]
+thread[140470844983040] created with stacksize[131072].
+thread[140470844983040] will finished: stackaddr[0x7fc1eacf1000] stacksize[131072]
+thread[140470844786432] created with stacksize[524288].
+thread[140470844786432] will finished: stackaddr[0x7fc1eac61000] stacksize[524288]
+thread[140470826829568] created with stacksize[2097152].
+thread[140470826829568] will finished: stackaddr[0x7fc1e99c1000] stacksize[2097152]
+------------------------------------------------------
+thread[140470844983040] created with stacksize[131072].
+thread[140470844983040] will finished: stackaddr[0x7fc1eacf1000] stacksize[131072]
+thread[140470844786432] created with stacksize[262144].
+thread[140470844786432] will finished: stackaddr[0x7fc1eac61000] stacksize[524288]
+thread[140470826829568] created with stacksize[1048576].
+thread[140470826829568] will finished: stackaddr[0x7fc1e99c1000] stacksize[2097152]
+thread[140470824666880] created with stacksize[0].
+thread[140470824666880] will finished: stackaddr[0x7fc1e91b1000] stacksize[8388608]
+```
+
+此时，`thread[0]`将会调用本节最开篇的创建线程方式创建线程栈为8MB的线程。不难看出，最后再次创建的8MB线程栈不再与首次创建的8MB线程栈地址相同，这也从侧面印证了此时存在的线程栈泄漏现象。
 
 
 
