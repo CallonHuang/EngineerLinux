@@ -263,7 +263,7 @@ void *start_routine(void *arg)
 
 实际上，`pthread_getattr_np`函数获取到的信息不止`stackaddr`和`stacksize`这么简单，还有一个动态申请的内部指针`cpuset`需要释放，它是表示线程所绑定的CPU信息的（本质上通过`sched_getaffinity`系统调用实现），而`pthread_attr_destroy`函数恰恰就是针对这一动态申请的内存进行释放的。
 
-code/glibc-2.32/补充知识点2相关源码 文件夹中列出了glibc中的代码，逻辑很简单，再次不作多余赘述。
+code/glibc-2.32/补充知识点2相关源码 文件夹中列出了glibc中的代码，逻辑很简单，在此不做多余赘述。
 
 
 
