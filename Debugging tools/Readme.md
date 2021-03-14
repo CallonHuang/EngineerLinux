@@ -8,26 +8,26 @@
 
 ### Applications
 
-- **gdbserver + [cross-compiler]gdb**
-- **pstack**
-- **sigaction + backtrace + backtrace_symbols**
-- **valgrind**
-- **tcmalloc**
-- **ASAN（Address-Sanitizier）**
+- *gdbserver + [cross-compiler]gdb*
+- *pstack*
+- *sigaction + backtrace + backtrace_symbols*
+- *valgrind*
+- *tcmalloc*
+- *ASAN（Address-Sanitizier）*
 
 ### System Libraries
 
-- **ltrace**
+- *ltrace*
 
 ### System Call Interface
 
-- **strace**
+- *strace*
 
 ### Linux Kernel Module
 
-- **vmtouch**
-- **perf**
-- **sysrq**
+- *vmtouch*
+- *perf*
+- *sysrq*
 
 
 
