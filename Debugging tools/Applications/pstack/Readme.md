@@ -48,5 +48,5 @@ $ cd build
 $ ../configure --prefix=$PWD/../out --host=arm-hisiv400-linux-gnueabi --enable-add-on=nptl CC=arm-hisiv400_v2-linux-gcc CXX=arm-hisiv400_v2-linux-g++ --disable-werror --disable-sanity-checks CFLAGS="-g -Os -funwind-tables"
 ```
 
-最后将编译出的成果物 *out/lib* 中的 *libpthread-2.29.so* 替换掉目标单板默认带的库即可。
+其中 *host* 指定为 *arm-hisiv400-linux-gnueabi* ，原因在于通过 *which arm-hisiv400_v2-linux-gcc* 并对路径进行 *ls -l* 可以发现 *arm-hisiv400_v2-linux-gcc* 实际上只是 *arm-hisiv400-linux-gnueabi-gcc* 的软链接，因此指定为其实体的前缀名称更为准确。最后将编译出的成果物 *out/lib* 中的 *libpthread-2.29.so* 替换掉目标单板默认带的库即可。
 
