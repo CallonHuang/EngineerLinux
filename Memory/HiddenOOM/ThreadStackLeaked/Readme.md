@@ -71,7 +71,6 @@ int stacksize = 8192;
 int start_routine(void *arg)
 {
     printf("hello world with count(%d)!\n", count++);
-    free(stack);
     exit(1);
 }
 
@@ -85,6 +84,7 @@ int main()
     }
     count++;
     clone(start_routine, (char *)stack + stacksize, CLONE_VM | CLONE_VFORK, 0);
+    free(stack);
     printf("after thread, count = %d!\n", count);
     while(1);//do other thing
     return 0;
@@ -94,8 +94,35 @@ int main()
 值得注意的是，
 
 1. 这里的`clone`实际调用的并不是系统调用，而是glibc封装的一段汇编代码，在 sysdeps/unix/sysv/linux/[平台名称]/clone.S 中可以看到，在它内部将调用真正的`clone`系统调用并在完成后直接在堆栈指针处存入传参并跳转运行指定函数，code/glibc-2.32文件夹中给出的是x86_64平台的clone.S源码，感兴趣的朋友可以一探究竟；
+
 2. `CLONE_VFORK`只是本例这么使用，并非glibc创建线程指定的flag，在这里指定是为了让子线程先于进程执行，这样就可以更好地看出两者共用`count`这一全局变量的现象；
+
 3. 指定的堆栈是申请出的堆内存的尾部，原因在于目前大多数平台上，栈的生长方向都是高地址到低地址增长。
+
+有朋友可能会说，明明已经有了`pthread_create`，那么在工程应用上用`clone`来模拟还有必要吗？还是说这只是个例子呢？
+
+实际上，工程应用上确实有用的地方，比如：*在一个进程里面启动一个线程，只有这个线程挂载后能够访问U盘，其他的进程和线程都不行，这种情况要怎么做？*
+
+上述场景用`pthread_create`是完全做不到的，而如果用`clone`的话，通过指定独立命名空间的方式就能完成，核心修改点如下：
+
+```c
+int start_routine(void *arg)
+{
+    int ret = mount("/dev/msa1", "/mnt/usb", "ext4", MS_MGC_VAL, "errors=continue");
+    if (ret != 0) {
+        printf("mount error with (%s)\n", strerror(errno));
+        exit(1);
+    }
+    pause();
+}
+
+int main()
+{
+    ...
+    clone(start_routine, (char *)stack + stacksize, CLONE_VM | CLONE_NEWNS, 0);
+    ...
+}
+```
 
 ### 线程资源的回收
 
