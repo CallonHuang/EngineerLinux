@@ -1,8 +1,8 @@
 # strace
 
+在工程应用中，经常会遇到死锁和CPU占用异常的问题，*strace* 则是在这些方面大方异彩的一个工具。其功能主要是跟踪系统调用，而由于 *Linux* 系统中死锁一般会调用到 *futex* 系统调用，且很多CPU异常占用问题都在于对系统调用无限制地调用导致，因而它一直作为这些问题处理过程中一个几乎必用的工具。
 
-
-其源码路径位于： https://github.com/strace/strace/releases 。
+源码路径位于： https://github.com/strace/strace/releases 。
 
 ### 原理
 
@@ -125,3 +125,109 @@ $ strace -c -f process
 ```
 
 注：*-t* / *-T* has no effect with *-c* .
+
+这里将以 *code* 文件夹中给出的卡死问题为例，使用 *strace* 来追溯死锁环：
+
+```shell
+$ ./main &
+<for a while...>
+$ ps -T
+  PID  SPID TTY          TIME CMD
+    8     8 tty1     00:00:01 bash
+  256   256 tty1     00:00:00 main
+  256   257 tty1     00:00:00 thread_func1
+  256   258 tty1     00:00:00 thread_func2
+  256   259 tty1     00:00:00 thread_func3
+  273   273 tty1     00:00:00 ps
+$ strace -p 257
+strace: Process 257 attached
+futex(0x7f1255801080, FUTEX_WAIT_PRIVATE, 2, NULL^Cstrace: Process 257 detached
+<detached ...>
+$ gdb -p 256
+...
+(gdb) p *(int *)(0x7f1255801080+2*sizeof(int))
+$1 = 258
+(gdb) quit
+A debugging session is active.
+
+        Inferior 1 [process 256] will be detached.
+
+Quit anyway? (y or n) y
+Detaching from program: /mnt/d/linux/git/EngineerLinux/Debugging tools/System Call Interface/strace/code/main, process 256
+$ strace -p 258
+strace: Process 258 attached
+futex(0x7f12558010c0, FUTEX_WAIT_PRIVATE, 2, NULL^Cstrace: Process 258 detached
+<detached ...>
+$ gdb -p 256
+...
+(gdb) p *(int *)(0x7f12558010c0+2*sizeof(int))
+$1 = 259
+(gdb) quit
+A debugging session is active.
+
+        Inferior 1 [process 256] will be detached.
+
+Quit anyway? (y or n) y
+Detaching from program: /mnt/d/linux/git/EngineerLinux/Debugging tools/System Call Interface/strace/code/main, process 256
+$ strace -p 259
+strace: Process 259 attached
+futex(0x7f1255801040, FUTEX_WAIT_PRIVATE, 2, NULL^Cstrace: Process 259 detached
+<detached ...>
+$ gdb -p 256
+...
+(gdb) p *(int *)(0x7f1255801040+2*sizeof(int))
+$1 = 257
+(gdb) quit
+A debugging session is active.
+
+        Inferior 1 [process 256] will be detached.
+
+Quit anyway? (y or n) y
+Detaching from program: /mnt/d/linux/git/EngineerLinux/Debugging tools/System Call Interface/strace/code/main, process 256
+```
+
+首先，*strace* 之所以可以排查死锁问题，原因在于 *mutex* 锁的结构定义：
+
+```c
+typedef union
+{
+  struct __pthread_mutex_s
+  {
+    int __lock;
+    unsigned int __count;
+    int __owner;
+#if __WORDSIZE == 64
+    unsigned int __nusers;
+#endif
+    /* KIND must stay at this position in the structure to maintain
+       binary compatibility.  */
+    int __kind;
+#if __WORDSIZE == 64
+    int __spins;
+    __pthread_list_t __list;
+# define __PTHREAD_MUTEX_HAVE_PREV      1
+#else
+    unsigned int __nusers;
+    __extension__ union
+    {
+      int __spins;
+      __pthread_slist_t __list;
+    };
+#endif
+  } __data;
+  char __size[__SIZEOF_PTHREAD_MUTEX_T];
+  long int __align;
+} pthread_mutex_t;
+```
+
+其结构的 *__owner* 成员保存着当前锁的拥有者的 *PID/TID* ，从而只需要知道锁的地址便可以使用 *gdb* 打印出锁的拥有者，从而一步步往上追溯死锁环。
+
+此时再来看例子中排查死锁的过程：
+
+1. *strace* 查看 *thread_func1* 线程，发现其在等待地址为 *0x7f1255801080* 的锁，同时通过 *gdb* 打印出该锁 *__owner* 的 *TID* 为 *258*，即该锁被 *thread_func2* 线程占用；
+2. *strace* 查看 *thread_func2* 线程，发现其在等待地址为 *0x7f12558010c0* 的锁，同时通过 *gdb* 打印出该锁 *__owner* 的 *TID* 为 *259*，即该锁被 *thread_func3* 线程占用；
+3. *strace* 查看 *thread_func3* 线程，发现其在等待地址为 *0x7f1255801040* 的锁，同时通过 *gdb* 打印出该锁 *__owner* 的 *TID* 为 *257*，即该锁被 *thread_func1* 线程占用；
+
+此时，死锁环就完整地展现在了排查人员的面前：
+
+![Image text](../../../img-storage/deadlock_example.png)
