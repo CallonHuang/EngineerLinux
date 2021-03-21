@@ -94,7 +94,13 @@ asmlinkage void syscall_trace_exit(struct pt_regs *regs)
 
 ```
 
-这样就能知道，*strace* 的底层必然就是利用了 *ptrace* 的特性追溯到了系统调用开始和结束的过程，而 *ptrace* 的追溯原理则是通过汇编判断放开了追溯后，在系统调用前后加上了追踪函数来实现。
+这样就能知道，*strace* 的底层必然就是利用了 *ptrace* 的特性追溯到了系统调用开始和结束的过程，而 *ptrace* 的追溯原理可由如下图进一步解释：
+
+![Image text](../../../img-storage/ptrace_sigtrap.png)
+
+- 调用 *syscall_trace_enter* 后，*Tracee* 将收到 *SIGTRAP* 信号，然后停止执行，而 *Tracer* 则会收到通知说有信号待处理。接下来 *Tracer* 就可以查看 *Tracee* 的状态，打印寄存器的值、时间戳等等信息。
+
+- 相应地，调用 *syscall_trace_exit* 后，也将通过相同的路径来让 *Tracer* 获取返回值、时间戳等等信息。
 
 ### 编译
 
