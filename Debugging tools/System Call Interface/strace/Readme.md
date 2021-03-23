@@ -145,11 +145,11 @@ $ strace -c -f process
   2393 root         0:00 {thread_func2} ./main
   2394 root         0:00 {thread_func3} ./main
   2396 root         0:00 ps -T
-$ strace -p 2392
+# strace -p 2392
 Process 2392 attached
 futex(0x10940, FUTEX_WAIT_PRIVATE, 2, NULL^CProcess 2392 detached
 <detached ...>
-$ gdb -p 2391
+# gdb -p 2391
 ...
 (gdb) p *(int *)(0x10940 + 2*sizeof(int))
 $1 = 2393
@@ -160,11 +160,11 @@ A debugging session is active.
 
 Quit anyway? (y or n) y
 Detaching from program: /xxx/main, process 2391
-$ strace -p 2393
+# strace -p 2393
 Process 2393 attached
 futex(0x10958, FUTEX_WAIT_PRIVATE, 2, NULL^CProcess 2393 detached
 <detached ...>
-$ gdb -p 2391
+# gdb -p 2391
 ...
 (gdb) p *(int *)(0x10958 + 2*sizeof(int))
 $1 = 2394
@@ -175,11 +175,11 @@ A debugging session is active.
 
 Quit anyway? (y or n) y
 Detaching from program: /xxx/main, process 2391
-$ strace -p 2394
+# strace -p 2394
 Process 2394 attached
 futex(0x10928, FUTEX_WAIT_PRIVATE, 2, NULL^CProcess 2394 detached
 <detached ...>
-$ gdb -p 2391
+# gdb -p 2391
 ...
 (gdb) p *(int *)(0x10928 + 2*sizeof(int))
 $1 = 2392
