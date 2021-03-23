@@ -132,64 +132,64 @@ $ strace -c -f process
 
 注：*-t* / *-T* has no effect with *-c* .
 
-这里将以 *code* 文件夹中给出的卡死问题为例，使用 *strace* 来追溯死锁环：
+这里将以 *code* 文件夹中给出的卡死问题为例，使用 *strace* 来追溯死锁环（这里同样以 *arm-hisiv400_v2-linux-gcc* 编译的程序跑在 *海思3536* 上为例）：
 
 ```shell
-$ ./main &
+# ./main &
 <for a while...>
-$ ps -T
-  PID  SPID TTY          TIME CMD
-    8     8 tty1     00:00:01 bash
-  256   256 tty1     00:00:00 main
-  256   257 tty1     00:00:00 thread_func1
-  256   258 tty1     00:00:00 thread_func2
-  256   259 tty1     00:00:00 thread_func3
-  273   273 tty1     00:00:00 ps
-$ strace -p 257
-strace: Process 257 attached
-futex(0x7f1255801080, FUTEX_WAIT_PRIVATE, 2, NULL^Cstrace: Process 257 detached
+# ps -T
+  PID  USER         TIME COMMAND
+  ...
+  2391 root         0:00 ./main
+  2392 root         0:00 {thread_func1} ./main
+  2393 root         0:00 {thread_func2} ./main
+  2394 root         0:00 {thread_func3} ./main
+  2396 root         0:00 ps -T
+$ strace -p 2392
+Process 2392 attached
+futex(0x10940, FUTEX_WAIT_PRIVATE, 2, NULL^CProcess 2392 detached
 <detached ...>
-$ gdb -p 256
+$ gdb -p 2391
 ...
-(gdb) p *(int *)(0x7f1255801080+2*sizeof(int))
-$1 = 258
+(gdb) p *(int *)(0x10940 + 2*sizeof(int))
+$1 = 2393
 (gdb) quit
 A debugging session is active.
 
-        Inferior 1 [process 256] will be detached.
+        Inferior 1 [process 2391] will be detached.
 
 Quit anyway? (y or n) y
-Detaching from program: /mnt/d/linux/git/EngineerLinux/Debugging tools/System Call Interface/strace/code/main, process 256
-$ strace -p 258
-strace: Process 258 attached
-futex(0x7f12558010c0, FUTEX_WAIT_PRIVATE, 2, NULL^Cstrace: Process 258 detached
+Detaching from program: /xxx/main, process 2391
+$ strace -p 2393
+Process 2393 attached
+futex(0x10958, FUTEX_WAIT_PRIVATE, 2, NULL^CProcess 2393 detached
 <detached ...>
-$ gdb -p 256
+$ gdb -p 2391
 ...
-(gdb) p *(int *)(0x7f12558010c0+2*sizeof(int))
-$1 = 259
+(gdb) p *(int *)(0x10958 + 2*sizeof(int))
+$1 = 2394
 (gdb) quit
 A debugging session is active.
 
-        Inferior 1 [process 256] will be detached.
+        Inferior 1 [process 2391] will be detached.
 
 Quit anyway? (y or n) y
-Detaching from program: /mnt/d/linux/git/EngineerLinux/Debugging tools/System Call Interface/strace/code/main, process 256
-$ strace -p 259
-strace: Process 259 attached
-futex(0x7f1255801040, FUTEX_WAIT_PRIVATE, 2, NULL^Cstrace: Process 259 detached
+Detaching from program: /xxx/main, process 2391
+$ strace -p 2394
+Process 2394 attached
+futex(0x10928, FUTEX_WAIT_PRIVATE, 2, NULL^CProcess 2394 detached
 <detached ...>
-$ gdb -p 256
+$ gdb -p 2391
 ...
-(gdb) p *(int *)(0x7f1255801040+2*sizeof(int))
-$1 = 257
+(gdb) p *(int *)(0x10928 + 2*sizeof(int))
+$1 = 2392
 (gdb) quit
 A debugging session is active.
 
-        Inferior 1 [process 256] will be detached.
+        Inferior 1 [process 2391] will be detached.
 
 Quit anyway? (y or n) y
-Detaching from program: /mnt/d/linux/git/EngineerLinux/Debugging tools/System Call Interface/strace/code/main, process 256
+Detaching from program: /xxx/main, process 2391
 ```
 
 首先，*strace* 之所以可以排查死锁问题，原因在于 *mutex* 锁的结构定义：
@@ -230,9 +230,20 @@ typedef union
 
 此时再来看例子中排查死锁的过程：
 
-1. *strace* 查看 *thread_func1* 线程，发现其在等待地址为 *0x7f1255801080* 的锁，同时通过 *gdb* 打印出该锁 *__owner* 的 *TID* 为 *258*，即该锁被 *thread_func2* 线程占用；
-2. *strace* 查看 *thread_func2* 线程，发现其在等待地址为 *0x7f12558010c0* 的锁，同时通过 *gdb* 打印出该锁 *__owner* 的 *TID* 为 *259*，即该锁被 *thread_func3* 线程占用；
-3. *strace* 查看 *thread_func3* 线程，发现其在等待地址为 *0x7f1255801040* 的锁，同时通过 *gdb* 打印出该锁 *__owner* 的 *TID* 为 *257*，即该锁被 *thread_func1* 线程占用；
+1. *strace* 查看 *thread_func1* 线程，发现其在等待地址为 *0x10940* 的锁，同时通过 *gdb* 打印出该锁 *__owner* 的 *TID* 为 *2393*，即该锁被 *thread_func2* 线程占用；
+2. *strace* 查看 *thread_func2* 线程，发现其在等待地址为 *0x10958* 的锁，同时通过 *gdb* 打印出该锁 *__owner* 的 *TID* 为 *2394*，即该锁被 *thread_func3* 线程占用；
+3. *strace* 查看 *thread_func3* 线程，发现其在等待地址为 *0x10928* 的锁，同时通过 *gdb* 打印出该锁 *__owner* 的 *TID* 为 *2392*，即该锁被 *thread_func1* 线程占用；
+
+并且在本例中，由于这几个锁都是全局变量，因此也能通过 *nm* 命令根据锁的地址进一步确认其名称：
+
+```shell
+$ arm-hisiv400_v2-linux-gcc -g main.c -o main -lpthread
+$ nm -lf sysv --size-sort main | grep '.bss\|.data' | grep 'OBJECT' | grep -v '.rodata' 
+completed.8864      |00010924|   b  |            OBJECT|00000001|     |.bss
+mutex_value1        |00010928|   B  |            OBJECT|00000018|     |.bss	/xxx/main.c:7
+mutex_value2        |00010940|   B  |            OBJECT|00000018|     |.bss	/xxx/main.c:8
+mutex_value3        |00010958|   B  |            OBJECT|00000018|     |.bss	/xxx/main.c:9
+```
 
 此时，死锁环就完整地展现在了排查人员的面前：
 
