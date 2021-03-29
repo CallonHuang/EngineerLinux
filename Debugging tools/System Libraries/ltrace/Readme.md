@@ -6,7 +6,7 @@
 
 *ltrace* 是一个（函数）库调用跟踪器（*library call tracer*），虽然也是基于 *ptrace* ，但是跟踪库函数和跟踪系统调用的差别还是很大的，这就是为什么 *ltrace* 是一个独立的工具而不是融于 *strace* 之中的原因。
 
-为了方便后续的内容，这里将先从动态库函数加载到程序中的过程来剖析。这里牵涉到两个概念 *GOT（Global Offset Table）*和 *PLT（Procedure Linkage Table）*：
+为了方便后续的内容，这里将先从动态库函数加载到程序中的过程来剖析。这里牵涉到两个概念 *GOT*（*Global Offset Table*）和 *PLT*（*Procedure Linkage Table*）：
 
 - *GOT*：译为全局偏移表，「链接器」为「外部符号」填充的实际偏移表
 - *PLT*：译为程序链接表，它有两个功能，要么在 *GOT* 中拿到地址并跳转，要么当 *GOT* 没有所需地址的时，触发「链接器」去找到所需地址
