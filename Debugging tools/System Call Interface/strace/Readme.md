@@ -37,7 +37,7 @@ syscall_table_end(sys_call_table)
 
 下面不妨再将内核源码 *entry-common.S* 中的 *vector_swi* 多展开一些：
 
-```c
+```assembly
 	...
 	addne	scno, r7, #__NR_SYSCALL_BASE	@ put OS number in
 	...
