@@ -1,6 +1,10 @@
 # SIGSEGV In Malloc
 
-这里主要讨论涉及的第三类问题，具体描述如下：`Program received signal SIGSEGV, Segmentation fault. _int_malloc (av=av@entry=0x7fffff3ebc40 <main_arena>, bytes=bytes@entry=4096) at malloc.c:3789`，先看下代码和现象：
+这里主要讨论涉及的第三类问题，具体描述如下：
+
+> Program received signal SIGSEGV, Segmentation fault. `_int_malloc` (av=av@entry=0x7fffff3ebc40 <main_arena>, bytes=bytes@entry=4096) at malloc.c:3789
+
+先看下代码和现象：
 
 ```c
 #include <stdlib.h>
@@ -112,10 +116,6 @@ bck = victim->bk;                  //指向最后一个chunk的上一个，此�
 unsorted_chunks (av)->bk = bck;   //指针操作，想要从unsorted bin中移除最后一个chunk节点
 bck->fd = unsorted_chunks (av);   //第3789行，访问了空指针崩溃
 ```
-
-
-
-
 
 
 

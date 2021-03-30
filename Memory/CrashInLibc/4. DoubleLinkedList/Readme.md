@@ -1,6 +1,10 @@
 # Corrupted Double-linked List In Free
 
-这里主要讨论涉及的第四类问题，具体描述如下：`corrupted double-linked list, Program received signal SIGABRT, Aborted.`，先看下代码和现象：
+这里主要讨论涉及的第四类问题，具体描述如下：
+
+> corrupted double-linked list, Program received signal SIGABRT, Aborted.
+
+先看下代码和现象：
 
 ```c
 #include <stdlib.h>

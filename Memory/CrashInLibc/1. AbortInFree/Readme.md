@@ -1,6 +1,10 @@
 # Abort In Free
 
-这里主要谈论涉及的第一大类问题：**Abort In Free:**  `free(): invalid pointer / free(): invalid size / munmap_chunk(): invalid pointer / double free or corruption`，首先不妨看下代码和现象：
+这里主要谈论涉及的第一大类问题：
+
+> **Abort In Free:**  `free()`: invalid pointer / `free()`: invalid size / `munmap_chunk()`: invalid pointer / double free or corruption
+
+首先不妨看下代码和现象：
 
 ```C
 #include <stdlib.h>

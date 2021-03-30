@@ -42,7 +42,7 @@ Idx Name          Size      VMA               LMA               File off  Algn
 ...
 ```
 
-其中，*.got.plt* 是 *GOT* 专门为 *PLT* 准备的节，*PLT* 就是首先从这里来尝试拿到地址的。
+>  其中，*.got.plt* 是 *GOT* 专门为 *PLT* 准备的节，*PLT* 就是首先从这里来尝试拿到地址的。
 
 为了更方便后面的调试，需要再安装下 *pwndbg* 这一工具：
 
@@ -239,7 +239,11 @@ PLT1: jmp *name1@GOTPCREL(%rip)
 1. 第一行代码跳转到一个地址，这个地址的值存储在 *GOT* 中，准确来说是 *.got.plt* 。
 2. *pushq $index1* 为动态连接器准备一些数据，然后通过 *jmp .PLT0* 跳转到另一段代码，后者会进而调用动态链接器。动态链接器通过 *$index1* 和其他一些数据来判断程序想调用的是哪个库函数，然后定位到函数地址，并将其写入 *.got.plt*，覆盖之前初始化时的默认值。当后面再次调用到这个函数时，就会直接找到函数地址，而不需再经过以上的动态链接器查找过程。
 
-为了能够 *hook* 库函数调用，*ltrace* 必须将它自己插入以上的流程，它的实现方式： **在函数的 PLT 表项里设置一个软件断点**。如在 *amd64 CPU* 上，通过如下汇编即可设置软件断点：
+为了能够 *hook* 库函数调用，*ltrace* 必须将它自己插入以上的流程，它的实现方式：
+
+> **在函数的 PLT 表项里设置一个软件断点**
+
+如在 *amd64 CPU* 上，通过如下汇编即可设置软件断点：
 
 ```assembly
 int $3
@@ -258,7 +262,9 @@ int $3
 
 ![Image text](../../../img-storage/ltrace.png)
 
-这就是 ***ltrace = ptrace + PTRACE_POKETEXT + int $3*** 。
+这就是
+
+> ***ltrace = ptrace + PTRACE_POKETEXT + int $3*** 。
 
 ### 编译
 
