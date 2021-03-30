@@ -2,7 +2,7 @@
 
 这里主要讨论涉及的第二类问题：
 
-> **sysmalloc：**malloc.c:2401: sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) || ((unsigned long) (old_size) >= MINSIZE && prev_inuse (old_top) && ((unsigned long) old_end & (pagesize - 1)) == 0)`' failed.
+> **sysmalloc:** malloc.c:2401: sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) || ((unsigned long) (old_size) >= MINSIZE && prev_inuse (old_top) && ((unsigned long) old_end & (pagesize - 1)) == 0)`' failed.
 
 首先还是看下代码和现象：
 
