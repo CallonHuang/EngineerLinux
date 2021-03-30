@@ -12,12 +12,12 @@ Linux的工程应用上，随着业务逻辑的复杂程度不断提高，会遇
 
 看完这些问题是否就有种上头的感觉？可能造成这些问题的例子都将在github相应文件夹的code子文件夹中提供，那么，接下来就逐一进行例子的分析并揭开libc内存管理的面纱。每个类型问题将对应一个文件夹进行阐述：
 
-|文件夹|问题|
+|问题|文件夹|
 |--|--|
-|**AbortInFree**|1|
-|**SysmallocAssert**|2|
-|**Sig11InMalloc**|3|
-|**DoubleLinkedList**|4|
-|**Others**|5|
+|1|[**AbortInFree**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/1.%20AbortInFree)|
+|2|[**SysmallocAssert**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/2.%20SysmallocAssert)|
+|3|[**Sig11InMalloc**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/3.%20Sig11InMalloc)|
+|4|[**DoubleLinkedList**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/4.%20DoubleLinkedList)|
+|5|[**Others**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/5.%20Others)|
 
 推荐从问题1逐一进行阅读，这样知识获取将更加连贯。

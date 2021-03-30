@@ -6,26 +6,26 @@
 
 实际上，自己也没全用过，但是接下来也不妨可以按照这个图的模块作为参照，对一些工具给大家进行科普。应用层这边的工具可能会介绍地更多一些，毕竟更接近自身的工作。
 
-### Applications
+### [Applications](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/Applications)
 
-- *gdbserver + [cross-compiler]gdb*
-- *pstack*
+- [*gdbserver + [cross-compiler]gdb*](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/Applications/gdb%2Bgdbserver)
+- [*pstack*](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/Applications/pstack)
 - *sigaction + backtrace + backtrace_symbols*
 - *valgrind*
 - *tcmalloc*
 - *ASAN（Address-Sanitizier）*
 
-### System Libraries
+### [System Libraries](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/System%20Libraries)
 
-- *ltrace*
+- [*ltrace*](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/System%20Libraries/ltrace)
 
-### System Call Interface
+### [System Call Interface](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/System%20Call%20Interface)
 
-- *strace*
+- [*strace*](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/System%20Call%20Interface/strace)
 
-### Linux Kernel Module
+### [Linux Kernel Module](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/Linux%20Kernel%20Module)
 
-- *vmtouch*
+- [*vmtouch*](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/Linux%20Kernel%20Module/vmtouch)
 - *perf*
 - *sysrq*
 
