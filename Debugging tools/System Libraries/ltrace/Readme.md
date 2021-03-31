@@ -1,6 +1,20 @@
 # ltrace
 
+### Content
+
+- [简介](#简介)
+
+- [原理](#原理)
+- [编译](#编译)
+- [使用](#使用)
+
+---
+
+### 简介
+
 *ltrace* 是一款用于跟踪库函数调用的工具，在工程应用中一般用于在不重编可执行程序的情况下，对库函数调用相关问题进行排查/优化。与 *strace* 较为类似，但是使用频次上还是远不如 *strace* 的。
+
+---
 
 ### 原理
 
@@ -266,6 +280,8 @@ int $3
 
 > ***ltrace = ptrace + PTRACE_POKETEXT + int $3*** 。
 
+---
+
 ### 编译
 
 目前，还未能成功在某一平台上编译出可用的 *ltrace*（编译正常，但是使用时没有输出），只在 *ubuntu*（*x86* 机器上）直接安装后使用正常。
@@ -275,6 +291,8 @@ sudo apt-get install ltrace
 ```
 
 只有若有成功交叉编译的案例，将会补充。
+
+---
 
 ### 使用
 
@@ -358,7 +376,7 @@ unlink(0x7fff3a4a6e7c, 0x7fff3a4a5460, 0x7fff3a4a5460, 0x7fdb289960f5) = 0
 
 在了解原理后，便可集成进代码如下（完整代码可参见 *code* 文件夹中的 *move.c*）：
 
-```c
+```diff
 int move_dir(char *srcDir, char *dstDir)
 {
     ...
@@ -366,25 +384,29 @@ int move_dir(char *srcDir, char *dstDir)
     while ((srcdir = readdir(srcDirp)) != NULL) {
         ...
         if (snprintf(srcPath, sizeof(srcPath), "%s/%s", srcDir, srcdir->d_name) >= sizeof(srcPath)
-            || snprintf(dstPath, sizeof(dstPath), "%s/%s", dstDir, srcdir->d_name) >= sizeof(srcPath)
-            || lstat(srcPath, &scrStat) != 0) {
+            || snprintf(dstPath, sizeof(dstPath), "%s/%s", dstDir, srcdir->d_name) >= sizeof(srcPath)) {
             ret = -1;
             goto SAFE_EXIT;
         }
         ...
-        if (S_ISREG(scrStat.st_mode)) {
-           	...
-            if (0 != rename(srcPath, dstPath)) {
-                int srcFd = -1, dstFd = -1;
-                srcFd = open(srcPath, O_RDONLY);
-                dstFd = open(dstPath, O_CREAT | O_WRONLY, 0777);
-                while (sendfile(dstFd, srcFd, NULL, 0x8000) > 0);
-                close(srcFd);
-                close(dstFd);
-                ...
-                unlink(srcPath);
-            }
-        }
+-       src = fopen(srcPath,"r+");
+-       dst = fopen(dstPath,"w+");
+-       while ((len = fread(buf, 1, 1024, src)) > 0)
+-           fwrite(buf, 1, len, dst);
+-       fclose(src);
+-       fclose(dst);
+-       unlink(srcPath);
++		if (S_ISREG(scrStat.st_mode)) {
++           if (0 != rename(srcPath, dstPath)) {
++               int srcFd = -1, dstFd = -1;
++               srcFd = open(srcPath, O_RDONLY);
++               dstFd = open(dstPath, O_CREAT | O_WRONLY, 0777);
++               while (sendfile(dstFd, srcFd, NULL, 0x8000) > 0);
++               close(srcFd);
++               close(dstFd);
++               unlink(srcPath);
++           }
++       }
     }
 SAFE_EXIT:
     closedir(srcDirp);

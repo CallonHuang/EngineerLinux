@@ -9,23 +9,23 @@
 ### [Applications](./Applications)
 
 - [*gdbserver + [cross-compiler]gdb*](./Applications/gdb+gdbserver/Readme.md)
-- [*pstack*](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/Applications/pstack)
+- [*pstack*](./Applications/pstack)
 - *sigaction + backtrace + backtrace_symbols*
 - *valgrind*
 - *tcmalloc*
 - *ASAN（Address-Sanitizier）*
 
-### [System Libraries](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/System%20Libraries)
+### [System Libraries](./System%20Libraries)
 
-- [*ltrace*](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/System%20Libraries/ltrace)
+- [*ltrace*](./System%20Libraries/ltrace)
 
-### [System Call Interface](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/System%20Call%20Interface)
+### [System Call Interface](./System%20Call%20Interface)
 
-- [*strace*](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/System%20Call%20Interface/strace)
+- [*strace*](./System%20Call%20Interface/strace)
 
-### [Linux Kernel Module](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/Linux%20Kernel%20Module)
+### [Linux Kernel Module](./Linux%20Kernel%20Module)
 
-- [*vmtouch*](https://github.com/CallonHuang/EngineerLinux/tree/master/Debugging%20tools/Linux%20Kernel%20Module/vmtouch)
+- [*vmtouch*](./Linux%20Kernel%20Module/vmtouch/Readme.md)
 - *perf*
 - *sysrq*
 

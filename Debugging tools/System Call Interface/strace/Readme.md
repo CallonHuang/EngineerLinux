@@ -1,8 +1,22 @@
 # strace
 
+### Content
+
+- [简介](#简介)
+
+- [原理](#原理)
+- [编译](#编译)
+- [使用](#使用)
+
+---
+
+### 简介
+
 在工程应用中，经常会遇到死锁和CPU占用异常的问题，*strace* 则是在这些方面大方异彩的一个工具。其功能主要是跟踪系统调用，而由于 *Linux* 系统中死锁一般会调用到 *futex* 系统调用，且很多CPU异常占用问题都在于对系统调用无限制地调用导致，因而它一直作为这些问题处理过程中一个几乎必用的工具。
 
 源码路径位于： https://github.com/strace/strace/releases 。
+
+---
 
 ### 原理
 
@@ -101,8 +115,9 @@ asmlinkage void syscall_trace_exit(struct pt_regs *regs)
 ![Image text](../../../img-storage/ptrace_sigtrap.png)
 
 - 调用 *syscall_trace_enter* 后，*Tracee* 将收到 *SIGTRAP* 信号，然后停止执行，而 *Tracer* 则会收到通知说有信号待处理。接下来 *Tracer* 就可以查看 *Tracee* 的状态，打印寄存器的值、时间戳等等信息。
-
 - 相应地，调用 *syscall_trace_exit* 后，也将通过相同的路径来让 *Tracer* 获取返回值、时间戳等等信息。
+
+---
 
 ### 编译
 
@@ -114,6 +129,8 @@ $ make
 ```
 
 在 *make* 完成后，就能在根目录下得到对应的 *strace* 可执行文件，由于默认是动态链接的，因此若出现运行时缺少库的问题，则需要额外从交叉编译器对应的库路径中找到缺少的库文件并拷贝到设备中。
+
+---
 
 ### 使用
 
