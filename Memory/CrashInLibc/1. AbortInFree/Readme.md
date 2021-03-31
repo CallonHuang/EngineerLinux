@@ -1,5 +1,7 @@
 # Abort In Free
 
+> 文章最后有彩蛋哟 :heart_eyes:
+
 这里主要谈论涉及的第一大类问题：
 
 > **Abort In Free:**  `free()`: invalid pointer / `free()`: invalid size / `munmap_chunk()`: invalid pointer / double free or corruption
@@ -90,7 +92,7 @@ struct malloc_chunk {
 
 之所以一行赋值语句就能造成libc的崩溃，其原因在于修改的是libc管理chunk的头部，而在调用`free`即chunk回收时，libc将校验其头部flags和size，若与预期不符则说明程序存在异常，因而直接`Assert`提示到开发人员。
 
-
+---
 
 ## 补充知识点
 

@@ -14,10 +14,10 @@ Linux的工程应用上，随着业务逻辑的复杂程度不断提高，会遇
 
 |问题|文件夹|
 |--|--|
-|1|[**AbortInFree**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/1.%20AbortInFree)|
-|2|[**SysmallocAssert**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/2.%20SysmallocAssert)|
-|3|[**Sig11InMalloc**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/3.%20Sig11InMalloc)|
-|4|[**DoubleLinkedList**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/4.%20DoubleLinkedList)|
-|5|[**Others**](https://github.com/CallonHuang/EngineerLinux/tree/master/Memory/CrashInLibc/5.%20Others)|
+|1|[**AbortInFree**](./1.%20AbortInFree)|
+|2|[**SysmallocAssert**](./2.%20SysmallocAssert)|
+|3|[**Sig11InMalloc**](./3.%20Sig11InMalloc)|
+|4|[**DoubleLinkedList**](./4.%20DoubleLinkedList)|
+|5|[**Others**](./5.%20Others/Readme.md)|
 
 推荐从问题1逐一进行阅读，这样知识获取将更加连贯。

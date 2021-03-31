@@ -114,7 +114,7 @@ Killed
 
 值得一提的是，实际上针对`bind error`这个单一的问题，还可以使用`setsockopt`设置`SO_REUSEPORT`来彻底解决，但是这自然不是本节关注的重点。
 
-
+---
 
 ## 补充知识点1——CLOEXEC原理
 
@@ -204,7 +204,7 @@ static inline void __set_close_on_exec(unsigned int fd, struct fdtable *fdt)
 //--------------------------------------------------------------------------------fs/file.c
 ```
 
-
+---
 
 ## 补充知识2——文件的底层表示
 
@@ -355,7 +355,7 @@ $ stat build.sh
 创建时间：-
 ```
 
-
+---
 
 ## 补充知识点3——其他需关注的继承
 

@@ -1,5 +1,7 @@
 # Sysmalloc Assertion
 
+> 文章最后有彩蛋哟 :heart_eyes:
+
 这里主要讨论涉及的第二类问题：
 
 > **sysmalloc:** malloc.c:2401: sysmalloc: Assertion `(old_top == initial_top (av) && old_size == 0) || ((unsigned long) (old_size) >= MINSIZE && prev_inuse (old_top) && ((unsigned long) old_end & (pagesize - 1)) == 0)`' failed.
@@ -88,7 +90,7 @@ sbrk(0) = 0x7fffc137c000, tmp = 0x7fffc135b470, ttmp = 0x7fffc135b880
 
 对于不是第一次的分配，要求原有top chunk的大小至少要满足`MINSIZE`（64位系统上一般是32 Byte）并且它的`prev_inuse`（前一小节提到的flag中的bit0）应该被置位。而本小节提供的案例程序中，直接将top chunk的head赋值为了0，因而校验失败。
 
-
+---
 
 ## 补充的知识
 

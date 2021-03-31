@@ -1,5 +1,7 @@
 # SIGSEGV In Malloc
 
+> 文章最后有彩蛋哟 :heart_eyes:
+
 这里主要讨论涉及的第三类问题，具体描述如下：
 
 > Program received signal SIGSEGV, Segmentation fault. `_int_malloc` (av=av@entry=0x7fffff3ebc40 <main_arena>, bytes=bytes@entry=4096) at malloc.c:3789
@@ -117,9 +119,9 @@ unsorted_chunks (av)->bk = bck;   //指针操作，想要从unsorted bin中移�
 bck->fd = unsorted_chunks (av);   //第3789行，访问了空指针崩溃
 ```
 
+---
 
-
-## 多啰嗦的话
+## libc调试大法
 
 若各位是在ubuntu虚拟机中进行代码编译和调试，为了更好地调试libc的问题并分析libc的源码，不妨安装如下软件包：
 
