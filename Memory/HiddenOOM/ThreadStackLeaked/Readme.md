@@ -7,8 +7,8 @@
   - [线程的状态](#线程的状态)
   - [线程创建的过程](#线程创建的过程)
   - [线程资源的回收](#线程资源的回收)
-- [彩蛋1-线程栈缓存](#补充知识点1——线程栈缓存) :heart_eyes:
-- [彩蛋2-pthread_attr_t泄漏](#补充知识点2——pthread_attr_t泄漏) :heart_eyes:
+- [彩蛋1-线程栈缓存](#补充知识点1-线程栈缓存) :heart_eyes:
+- [彩蛋2-pthread_attr_t泄漏](#补充知识点2-pthread_attr_t泄漏) :heart_eyes:
 
 ---
 
@@ -154,7 +154,7 @@ int main()
 
 ---
 
-## 补充知识点1——线程栈缓存
+## 补充知识点1-线程栈缓存
 
 其实，如果对`ALLOCATE_STACK`略为深入研究的话，会发现glibc在线程栈的申请和释放其实还对应有缓存链表，不妨用一个例子来验证下（code文件夹中的test_stack_cache.c）：
 
@@ -283,7 +283,7 @@ thread[140470824666880] will finished: stackaddr[0x7fc1e91b1000] stacksize[83886
 
 ---
 
-## 补充知识点2——pthread_attr_t泄漏
+## 补充知识点2-pthread_attr_t泄漏
 
 还是刚刚的例子（为了说明需要这里只截取了`start_routine`函数部分），
 
