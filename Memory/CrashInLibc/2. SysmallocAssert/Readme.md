@@ -1,6 +1,6 @@
 # Sysmalloc Assertion
 
-> 文章最后有彩蛋哟 :heart_eyes:
+> 文章最后有[彩蛋](#补充的知识)哟 :heart_eyes:
 
 这里主要讨论涉及的第二类问题：
 

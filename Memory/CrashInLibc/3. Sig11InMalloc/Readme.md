@@ -1,6 +1,6 @@
 # SIGSEGV In Malloc
 
-> 文章最后有彩蛋哟 :heart_eyes:
+> 文章最后有[彩蛋](#libc调试大法)哟 :heart_eyes:
 
 这里主要讨论涉及的第三类问题，具体描述如下：
 

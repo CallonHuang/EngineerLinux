@@ -1,6 +1,6 @@
 # Abort In Free
 
-> 文章最后有彩蛋哟 :heart_eyes:
+> 文章最后有[彩蛋](#补充知识点)哟 :heart_eyes:
 
 这里主要谈论涉及的第一大类问题：
 
