@@ -396,7 +396,7 @@ int move_dir(char *srcDir, char *dstDir)
 -       fclose(src);
 -       fclose(dst);
 -       unlink(srcPath);
-+		if (S_ISREG(scrStat.st_mode)) {
++       if (S_ISREG(scrStat.st_mode)) {
 +           if (0 != rename(srcPath, dstPath)) {
 +               int srcFd = -1, dstFd = -1;
 +               srcFd = open(srcPath, O_RDONLY);
