@@ -9,7 +9,7 @@
 
 - [socket](#socket)
 
-  - [*SO_SNDTIMEO* / *SO_RCVTIMEO* / *select*](#SO_SNDTIMEO / SO_RCVTIMEO / select) 
+  - [*SO_SNDTIMEO* / *SO_RCVTIMEO* / *select*](#*SO_SNDTIMEO* / *SO_RCVTIMEO* / *select*) 
 
 - [附-socket+mqueue=Ipc类](#附-socket+mqueue=Ipc类)
 
