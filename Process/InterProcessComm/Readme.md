@@ -9,7 +9,7 @@
 
 - [socket](#socket)
 
-  - [*SO_SNDTIMEO*/*SO_RCVTIMEO*/*select*](#SO_SNDTIMEO/SO_RCVTIMEO/select) 
+  - [*SO_SNDTIMEO* / *SO_RCVTIMEO* / *select*](#so_sndtimeoso_rcvtimeoselect) 
 
 - [附-socket+mqueue=Ipc类](#附-socket+mqueue=Ipc类)
 
@@ -95,7 +95,7 @@ ret = mq_timedreceive(ipc_info_.ipc_mq, buf, len, nullptr, &abs_timeout);
 
 ## socket
 
-### *SO_SNDTIMEO*/*SO_RCVTIMEO*/*select*
+### *SO_SNDTIMEO* / *SO_RCVTIMEO* / *select*
 
 和 *mq_timedxxx* 如出一辙，`socket` 使用中也不免要对 `recv` / `recvfrom` / `accept` / `send` / `sendto` / `connect` 进行超时设定，这一般在应用上需要通过 `setsockopt` 函数来完成，当然如果需要更加准确的超时，那么 `select` 是一个更好的选择：
 
