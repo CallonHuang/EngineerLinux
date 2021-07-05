@@ -8,9 +8,8 @@
   - [`mq_timedxxx`](#mq_timedxxx)
 
 - [socket](#socket)
-
-  - [*SO_SNDTIMEO* / *SO_RCVTIMEO* / *select*](#so_sndtimeoso_rcvtimeoselect) 
-
+- [*SO_SNDTIMEO* / *SO_RCVTIMEO* / *select*](#so_sndtimeo--so_rcvtimeo--select) 
+  
 - [附-socket+mqueue=Ipc类](#附-socket+mqueue=Ipc类)
 
 ---
