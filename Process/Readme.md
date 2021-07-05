@@ -5,5 +5,5 @@
 - [进程的启动](./StartProcess)
 - [进程的继承](./InheritProcess)
 - 进程的调度
-- 进程间通信
+- [进程间通信](./InterProcessComm)
 
