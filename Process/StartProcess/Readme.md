@@ -176,11 +176,53 @@ $ ps
  9500 tty1     00:00:00 ps
 ```
 
+
+
 ---
 
-## 补充知识点
+## 补充知识点1
 
-若需要在工程应用上封装启动进程的函数，那么父子进程的信号处理需要额外关注。在`CreateProcess`函数中可以看到这部分，总结下来有四点：
+实际上，无需 `fork` 子进程就能避免 `sh -c` 进程的方法还有：
+
+```diff
+int main()
+{
+#if defined(USE_SYSTEM)
+    system("./process");
+#elif defined(USE_POPEN)
+    FILE *fp = popen("./process", "w");
+    if (fp == (void *)0)
+        return -1;
+    pclose(fp);
+#else
+-    CreateProcess("./process"); //fork+execl
++    CreateProcess_ex("./process"); //fork+execvp
+#endif
+    while (1);
+    return 0;
+}
+```
+
+其实深入想想，在shell下既然执行main进程的时候只需要 `./main &` 就行，也没产生什么 `sh -c` 进程，那么一定是还存在一种方式可以保证只起单一目标进程的，不妨先验证下：
+
+```shell
+$ ps
+  PID TTY          TIME CMD
+  293 tty2     00:00:02 bash
+  741 tty2     00:00:00 main
+  742 tty2     00:00:00 process
+  743 tty2     00:00:00 ps
+```
+
+`CreateProcess_ex` 在 main.c 中也给出了，其原理其实就是将`sh -c` 的过程展开在了源码中，这其中包含解析shell环境变量、解析重定向输出和传递通用参数三个环节。
+
+
+
+---
+
+## 补充知识点2
+
+若需要在工程应用上封装启动进程的函数，那么父子进程的信号处理需要额外关注。在 `CreateProcess` 和 `CreateProcess_ex` 函数都可以看到这部分，总结下来有四点：
 
 1. 父进程需要忽略`SIGINT`和`SIGQUIT`
 2. 父进程需要阻塞`SIGCHLD`
@@ -196,3 +238,12 @@ $ ps
   
 
 有相关需要封装启动进程类似“轮子”的小伙伴，不妨研究下glib库（下载地址为 https://ftp.acc.umu.se/pub/GNOME/sources/glib/ ），虽然网上对它褒贬不一，但不妨碍肯定它是一个非常优秀的C语言库，它将C语言与面向对象思想结合地非常完美，很值得研究和借鉴。对于启动进程而言，它封装的`g_spawn_async`（也在本节code文件夹中给出了源码）既考虑到了信号处理的方方面面，又提供了本节所述的后台运行方式，可以大大降低自己封装的工作量和风险。
+
+
+
+
+
+
+
+
+

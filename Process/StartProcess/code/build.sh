@@ -9,5 +9,5 @@ safe_run()
 }
 
 rm -f main process
-safe_run gcc main.c -o main
+safe_run g++ main.c -o main
 safe_run gcc process.c -o process
