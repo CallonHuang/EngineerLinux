@@ -143,6 +143,412 @@ ret = recvfrom(ipc_info_.socket, buf, len, 0, (struct sockaddr *)&addr, &addr_le
 
 ## condition_variable
 
+条件变量一般用于多线程间的同步操作，C++11以后一般使用 `std::condition_variable`  ，而C语言上则直接使用 `pthread_cond_t` 。虽然只是简单的同步，但是其中也有一些匪夷所思的奇怪现象，先来看一个例子（对应code文件夹中的 *test1.cpp*）：
+
+```c++
+#include <functional>
+#include <memory>
+#include <thread>
+#include <queue>
+#include <iostream>
+#include <mutex>
+#include <condition_variable>
+#include <semaphore.h>
+#include <unistd.h>
+
+bool ready = false;
+std::mutex mutex_thread;
+std::condition_variable cond;
+
+std::shared_ptr<std::thread> thread_wait;
+std::shared_ptr<std::thread> thread_notify;
+
+void *wait_routine(void)
+{
+    while (true) {
+        std::unique_lock<std::mutex> lock(mutex_thread);
+        while (!ready)
+            cond.wait(lock);
+        ready = false;
+        std::cout << "waited!" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+    }
+    return nullptr;
+}
+#ifdef USE_FUNC
+void notify()
+{
+    std::unique_lock<std::mutex> lock(mutex_thread);
+    ready = true;
+    cond.notify_all();
+}
+#endif
+void *notify_routine()
+{
+    while (true) {
+#ifdef USE_FUNC
+        notify();
+#else
+        std::unique_lock<std::mutex> lock(mutex_thread);
+        ready = true;
+    	cond.notify_all();
+#endif
+        std::cout << "is ready" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(40));
+    }
+    return nullptr;
+}
+
+int main()
+{
+    thread_wait = std::make_shared<std::thread>(&wait_routine);
+    thread_notify = std::make_shared<std::thread>(&notify_routine);
+    thread_wait->join();
+    thread_notify->join();
+    return 0;
+}
+```
+
+这个例子想要强调的部分很明显，就是用 `USE_FUNC` 宏包住的部分，差异仅仅在于是否使用函数调用，下面不妨看看运行上的差异：
+
+```shell
+$ g++ test1.cpp -o test1 -lpthread
+$ ./test1
+is ready
+is ready
+is ready
+is ready
+is ready
+is ready
+is ready
+...
+^C
+$ g++ -DUSE_FUNC test1.cpp -o test1 -lpthread
+$ ./test1
+is ready
+waited!
+is ready
+waited!
+is ready
+waited!
+is ready
+waited!
+...
+```
+
+造成该现象的原因就是对 `std::unique_lock<std::mutex>` 理解得不深刻，它会在作用域消失时解锁，却在刚解锁后直接加锁，从而造成 `notify_routine` 这个线程一直占用锁打印的问题。
+
+当然，这不是本小题的重点，下面这个例子才是：
+
+```c++
+#include <functional>
+#include <memory>
+#include <thread>
+#include <queue>
+#include <iostream>
+#include <mutex>
+#include <condition_variable>
+#include <semaphore.h>
+#include <unistd.h>
+
+typedef struct {
+    struct {
+        uint32_t width;
+        uint32_t height;
+        int field;
+        int pformat;
+        int vformat;
+        int cmode;
+        int drange;
+        int cmnt;
+        uint32_t header[3];
+        uint32_t stride[3];
+        uint32_t extstride[3];
+
+        uint64_t headerphy[3];
+        uint64_t headervir[3];
+        uint64_t phyaddr[3];
+        uint64_t viraddr[3];
+        uint64_t extphyaddr[3];
+        uint64_t extviraddr[3];
+
+        int16_t offsettop;
+        int16_t offsetbottom;
+        int16_t offsetleft;
+        int16_t offsetright;
+
+        uint32_t max;
+        uint32_t min;
+
+        uint32_t timeref;
+        uint64_t pts;
+
+        uint64_t pdata;
+        uint32_t framef;
+    };
+    uint32_t id;
+    int mode;
+} INFO;
+
+std::mutex mutex_queue1;
+std::queue<INFO> queue1;
+std::mutex mutex_queue2;
+std::queue<INFO> queue2;
+
+#ifdef SEM
+sem_t sem;
+#else
+std::mutex mutex_thread;
+std::condition_variable cond;
+#endif
+bool ready = false;
+
+std::shared_ptr<std::thread> thread_wait;
+std::shared_ptr<std::thread> thread_notify1;
+std::shared_ptr<std::thread> thread_notify2;
+
+void *wait_routine(void)
+{
+    while (true) {
+#ifdef SEM
+        sem_wait(&sem);
+#else
+        std::unique_lock<std::mutex> lock(mutex_thread);
+        while (!ready)
+            cond.wait(lock);
+        ready = false;
+#endif
+        std::cout << "waited!" << std::endl;
+        std::unique_lock<std::mutex> lock1(mutex_queue1);
+        std::unique_lock<std::mutex> lock2(mutex_queue2);
+        if (queue1.size() > 0 && queue2.size() > 0) {
+            queue1.pop();
+            queue2.pop();
+            //do something
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        }
+    }
+    return nullptr;
+}
+#ifndef SEM
+void notify()
+{
+    std::unique_lock<std::mutex> lock(mutex_thread);
+    ready = true;
+    cond.notify_all();
+}
+#endif
+void *notify_routine(int idx)
+{
+    while (true) {
+        INFO info;
+        if (1 == idx) {
+            std::unique_lock<std::mutex> lock1(mutex_queue1);
+            queue1.push(std::move(info));
+            if (queue1.size() > 4)
+                queue1.pop();
+        } else {
+            std::unique_lock<std::mutex> lock2(mutex_queue2);
+            queue2.push(std::move(info));
+            if (queue2.size() > 4)
+                queue2.pop();
+        }
+#ifdef SEM
+        sem_post(&sem);
+#else
+        notify();
+#endif
+        std::cout << idx << "is ready" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(40));
+    }
+    return nullptr;
+}
+
+int main()
+{
+#ifdef SEM
+    sem_init(&sem, 0, 0);
+#endif
+    thread_wait = std::make_shared<std::thread>(&wait_routine);
+    thread_notify1 = std::make_shared<std::thread>(&notify_routine, 1);
+    thread_notify2 = std::make_shared<std::thread>(&notify_routine, 2);
+    thread_wait->join();
+    thread_notify1->join();
+    thread_notify2->join();
+    return 0;
+}
+```
+
+这是一个真实发生的案例，因此数据结构这里也尽量保证了真实，实现的事情很简单：
+
+> 当两个生产者都产生东西后，消费者将其一同取出组装
+
+从逻辑上看也没有任何问题，接下来运行看看：
+
+```shell
+$ g++ test2.cpp -o test2 -lpthread
+$ ./test2
+...
+is ready
+2is ready
+waited!
+1is ready
+waited!
+2is ready
+waited!
+...
+```
+
+虽然很难，但是确实有一定几率会出现，两次 *ready* 但是只有一次 *wait* 的情况，感兴趣的朋友可以直接改下程序用计数的方式打印出来，会更加明显。
+
+这不禁让人怀疑，莫非是消费者耗时太长导致的？这里不妨看下将消息队列改为信号量的结果：
+
+```shell
+$ $ g++ -DSEM test2.cpp -o test2 -lpthread
+$ ./test2
+$ ./test2
+2is ready
+waited!
+1is ready
+waited!
+2is ready
+waited!
+1is ready
+waited!
+...
+```
+
+得到的答案非常工整，那么原因只能出在 `condition_variable` 本身了：
+
+> `pthread_cond_signal` 函数的作用是发送一个信号给另外一个正在处于阻塞等待状态的线程，使其脱离阻塞状态，继续执行。
+>
+> 如果没有线程处在阻塞等待状态，`pthread_cond_signal` 也会成功返回。
+
+原因在于线程在非阻塞等待的时候返回了，此时也认为是 *ready* 了，所以造成计数的不一致，而信号量由于是原子操作，一定会等 `sem_wait` 时才会发送。
+
+所以，其实本质原因确实是消费者耗时太长，只是在和信号量比较上，信号量会去阻塞生产者，所以现象看起来更加 “合理”。
+
+其实这个例子还存在的问题在于对条件变量的使用方式不太对，既然想要等待两个都就绪，等待的条件就不应该是某一个就绪：
+
+```diff
+#include <functional>
+#include <memory>
+#include <thread>
+#include <queue>
+#include <iostream>
+#include <mutex>
+#include <condition_variable>
+#include <semaphore.h>
+#include <unistd.h>
+...
+
+#ifdef SEM
+sem_t sem;
+#else
+std::mutex mutex_thread;
+std::condition_variable cond;
+#endif
+-bool ready = false;
+
+std::shared_ptr<std::thread> thread_wait;
+std::shared_ptr<std::thread> thread_notify1;
+std::shared_ptr<std::thread> thread_notify2;
+
+void *wait_routine(void)
+{
+    while (true) {
+#ifdef SEM
+        sem_wait(&sem);
+#else
+        std::unique_lock<std::mutex> lock(mutex_thread);
+-		while (!ready)
++       while (!(queue1.size() > 0 && queue2.size() > 0))
+            cond.wait(lock);
+-       ready = false;
+#endif
+        std::cout << "waited!" << std::endl;
+        std::unique_lock<std::mutex> lock1(mutex_queue1);
+        std::unique_lock<std::mutex> lock2(mutex_queue2);
+-       if (queue1.size() > 0 && queue2.size() > 0) {
+            queue1.pop();
+            queue2.pop();
+            //do something
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+-       }
+    }
+    return nullptr;
+}
+#ifndef SEM
+void notify()
+{
+    std::unique_lock<std::mutex> lock(mutex_thread);
+-   ready = true;
+    cond.notify_all();
+}
+#endif
+void *notify_routine(int idx)
+{
+    while (true) {
+        INFO info;
+        if (1 == idx) {
+            std::unique_lock<std::mutex> lock1(mutex_queue1);
+            queue1.push(std::move(info));
+            if (queue1.size() > 4)
+                queue1.pop();
+        } else {
+            std::unique_lock<std::mutex> lock2(mutex_queue2);
+            queue2.push(std::move(info));
+            if (queue2.size() > 4)
+                queue2.pop();
+        }
+#ifdef SEM
+        sem_post(&sem);
+#else
+        notify();
+#endif
+        std::cout << idx << "is ready" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(40));
+    }
+    return nullptr;
+}
+
+int main()
+{
+#ifdef SEM
+    sem_init(&sem, 0, 0);
+#endif
+    thread_wait = std::make_shared<std::thread>(&wait_routine);
+    thread_notify1 = std::make_shared<std::thread>(&notify_routine, 1);
+    thread_notify2 = std::make_shared<std::thread>(&notify_routine, 2);
+    thread_wait->join();
+    thread_notify1->join();
+    thread_notify2->join();
+    return 0;
+}
+```
+
+这样就会得到每两个 `notify` 相应一次的情况，但是这个是正确且想要达到的效果。
+
+```shell
+$ g++ test2.cpp -o test2 -lpthread
+$ ./test2
+1is ready
+2is ready
+waited!
+1is ready
+2is ready
+waited!
+1is ready
+2is ready
+waited!
+1is ready
+2is ready
+waited!
+1is ready
+2is ready
+waited!
+```
+
 
 ---
 
