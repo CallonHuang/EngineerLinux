@@ -101,12 +101,12 @@ void *notify_routine(int idx)
         INFO info;
         if (1 == idx) {
             std::unique_lock<std::mutex> lock1(mutex_queue1);
-            queue1.push(std::move(info));
+            queue1.push(info);
             if (queue1.size() > 4)
                 queue1.pop();
         } else {
             std::unique_lock<std::mutex> lock2(mutex_queue2);
-            queue2.push(std::move(info));
+            queue2.push(info);
             if (queue2.size() > 4)
                 queue2.pop();
         }
