@@ -606,7 +606,7 @@ void notify()
 ...
 ```
 
-这样就会得到每两个 `notify` 相应一次 `wait` 的情况，但是这个是正确且想要达到的效果。
+这样就会得到每两个 `notify` 响应一次 `wait` 的情况，但是这个是正确且想要达到的效果。
 
 ```shell
 $ g++ test2.cpp -o test2 -lpthread
