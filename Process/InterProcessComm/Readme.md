@@ -406,7 +406,7 @@ waited!
 这不禁让人怀疑，莫非是消费者耗时太长导致的？这里不妨看下将消息队列改为信号量的结果：
 
 ```shell
-$ $ g++ -DSEM test2.cpp -o test2 -lpthread
+$ g++ -DSEM test2.cpp -o test2 -lpthread
 $ ./test2
 $ ./test2
 2is ready
@@ -426,22 +426,137 @@ waited!
 >
 > 如果没有线程处在阻塞等待状态，`pthread_cond_signal` 也会成功返回。
 
-不难看出，该现象的原因在于线程在非阻塞等待的时候返回了，此时程序也认为是 *ready* 打印了，所以造成计数的不一致，而信号量由于是原子操作，不存在 “信号错过” 这种问题，信号量的值是在正常被累加的。
+不难看出，该现象的原因在于线程在非阻塞等待的时候返回了，此时程序也认为是 *ready* 打印了，所以造成计数的不一致，而信号量由于是原子操作，不存在 “信号错过” 这种问题，信号量的值是在正常被累加的。但是这里值得警醒的是，信号量值 *OVERFLOW* 的问题：
 
-所以，其实本质原因确实是消费者耗时太长，只是在当前实现的方式上，信号量更佳适宜。
+```shell
+SEM_POST(3)                                   Linux Programmer's Manual                                   SEM_POST(3)
 
-但这不代表着不能使用条件变量，其实这个例子还存在的问题就在于实现方式不太对，既然想要等待两个都就绪，等待的条件就不应该是某一个就绪：
+NAME
+       sem_post - unlock a semaphore
+
+SYNOPSIS
+       #include <semaphore.h>
+
+       int sem_post(sem_t *sem);
+
+       Link with -pthread.
+
+DESCRIPTION
+       sem_post()  increments  (unlocks)  the  semaphore  pointed  to  by sem.  If the semaphore's value consequently
+       becomes greater than zero, then another process or thread blocked in a sem_wait(3) call will be woken  up  and
+       proceed to lock the semaphore.
+
+RETURN VALUE
+       sem_post()  returns  0 on success; on error, the value of the semaphore is left unchanged, -1 is returned, and
+       errno is set to indicate the error.
+
+ERRORS
+       EINVAL sem is not a valid semaphore.
+
+       EOVERFLOW
+              The maximum allowable value for a semaphore would be exceeded.
+```
+
+从 `man sem_post` 不难看出，若溢出会造成 `sem_post` 返回失败，想查看设计的系统中是否有溢出的风险，可以每次 `sem_post` 后使用 `sem_getvalue` 将信号量的值打印出来，若出现值一直累加的情况，那么将有极大的溢出风险，将本例的延时进一步修改后将得到溢出问题的案例：
 
 ```diff
-#include <functional>
-#include <memory>
-#include <thread>
-#include <queue>
-#include <iostream>
-#include <mutex>
-#include <condition_variable>
-#include <semaphore.h>
-#include <unistd.h>
+...
+void *wait_routine(void)
+{
+    while (true) {
+#ifdef SEM
+        sem_wait(&sem);
+#else
+        std::unique_lock<std::mutex> lock(mutex_thread);
+        while (!ready)
+            cond.wait(lock);
+        ready = false;
+#endif
+        std::cout << "waited!" << std::endl;
+        std::unique_lock<std::mutex> lock1(mutex_queue1);
+        std::unique_lock<std::mutex> lock2(mutex_queue2);
+        if (queue1.size() > 0 && queue2.size() > 0) {
+            queue1.pop();
+            queue2.pop();
+            //do something
+-           std::this_thread::sleep_for(std::chrono::milliseconds(20));
++           std::this_thread::sleep_for(std::chrono::milliseconds(40));
+        }
+    }
+    return nullptr;
+}
+#ifndef SEM
+void notify()
+{
+    std::unique_lock<std::mutex> lock(mutex_thread);
+    ready = true;
+    cond.notify_all();
+}
+#endif
+void *notify_routine(int idx)
+{
+    while (true) {
+        INFO info;
+        if (1 == idx) {
+            std::unique_lock<std::mutex> lock1(mutex_queue1);
+            queue1.push(info);
+            if (queue1.size() > 4)
+                queue1.pop();
+        } else {
+            std::unique_lock<std::mutex> lock2(mutex_queue2);
+            queue2.push(info);
+            if (queue2.size() > 4)
+                queue2.pop();
+        }
+#ifdef SEM
+        sem_post(&sem);
++       int sval;
++       sem_getvalue(&sem, &sval);
++       std::cout << sval << std::endl;
+#else
+        notify();
+#endif
+        std::cout << idx << "is ready" << std::endl;
+-       std::this_thread::sleep_for(std::chrono::milliseconds(40));
++       std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    return nullptr;
+}
+...
+```
+
+运行结果如下：
+
+```shell
+$ g++ -DSEM test2.cpp -o test2 -lpthread
+$ ./test2
+1
+1is ready
+waited!
+2
+2is ready
+waited!
+1
+2is ready
+2
+1is ready
+waited!
+2
+2is ready
+3
+1is ready
+waited!
+3
+2is ready
+4
+...
+```
+
+所以，使用信号量依然是不安全的，那该如何是好？
+
+其实，前面使用条件变量的例子若是仔细分析是可以发现存在实现方式不对的问题的，既然想要等待两个都就绪，等待的条件就不应该是某一个就绪：
+
+```diff
 ...
 
 #ifdef SEM
@@ -488,45 +603,7 @@ void notify()
     cond.notify_all();
 }
 #endif
-void *notify_routine(int idx)
-{
-    while (true) {
-        INFO info;
-        if (1 == idx) {
-            std::unique_lock<std::mutex> lock1(mutex_queue1);
-            queue1.push(info);
-            if (queue1.size() > 4)
-                queue1.pop();
-        } else {
-            std::unique_lock<std::mutex> lock2(mutex_queue2);
-            queue2.push(info);
-            if (queue2.size() > 4)
-                queue2.pop();
-        }
-#ifdef SEM
-        sem_post(&sem);
-#else
-        notify();
-#endif
-        std::cout << idx << "is ready" << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(40));
-    }
-    return nullptr;
-}
-
-int main()
-{
-#ifdef SEM
-    sem_init(&sem, 0, 0);
-#endif
-    thread_wait = std::make_shared<std::thread>(&wait_routine);
-    thread_notify1 = std::make_shared<std::thread>(&notify_routine, 1);
-    thread_notify2 = std::make_shared<std::thread>(&notify_routine, 2);
-    thread_wait->join();
-    thread_notify1->join();
-    thread_notify2->join();
-    return 0;
-}
+...
 ```
 
 这样就会得到每两个 `notify` 相应一次 `wait` 的情况，但是这个是正确且想要达到的效果。
