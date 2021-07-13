@@ -6,13 +6,13 @@
 - [mqueue](#mqueue)
   - [`mq_open`](#mq_open)
   - [`mq_timedxxx`](#mq_timedxxx)
-
 - [socket](#socket)
   - [*SO_SNDTIMEO* / *SO_RCVTIMEO* / `select`](#so_sndtimeo--so_rcvtimeo--select) 
-  
 - [condition_variable](#condition_variable)
-
+- [share_memory](#share_memory)
+  - [`shmctl`](#shmctl)
 - [附-socket+mqueue=Ipc类](#附-socket+mqueue=Ipc类)
+- [附-shmctl删除共享内存的源码分析](#附-shmctl删除共享内存的源码分析)
 
 ---
 
@@ -525,7 +525,7 @@ void *notify_routine(int idx)
 ...
 ```
 
-运行结果如下：
+修改后得到的运行结果如下：
 
 ```shell
 $ g++ -DSEM test2.cpp -o test2 -lpthread
@@ -628,6 +628,98 @@ waited!
 waited!
 ```
 
+## share_memory
+
+### `shmctl`
+
+在工程应用中，当需要较多数据共享时，共享内存是普遍接受和使用的方式，但是若是对其了解不深入，将会陷入莫名其妙的困境：
+
+```c++
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+
+#define KEY_PATH "/usr"
+
+#define CHECK_FUNC_RET(cond, ret, ...) {    \
+    if (cond) {                             \
+        printf(__VA_ARGS__);                \
+        return ret;                         \
+    }                                       \
+}
+
+int main()
+{
+    int key = ftok(KEY_PATH, 0);
+    int shm_id = shmget(key, 1024, IPC_CREAT | IPC_EXCL | 0666);//shmget(key, 1024, IPC_CREAT | 0666);
+    CHECK_FUNC_RET(shm_id < 0, -1, "shmget failed, errno %d(%s)\n", errno, strerror(errno));
+    void *addr = shmat(shm_id, nullptr, 0);
+    CHECK_FUNC_RET(addr == (void *)-1, -1, "shmat failed, errno %d(%s)\n", errno, strerror(errno));
+    struct shmid_ds shmds;
+    shmctl(shm_id, IPC_STAT, &shmds);
+    printf("no. of current attaches: %ld\n", shmds.shm_nattch);
+#ifdef SHMDT
+    shmdt(addr);
+#endif
+#ifndef NO_IPC_RMID
+    shmctl(shm_id, IPC_RMID, nullptr);
+#endif
+    shm_id = shmget(key, 1024, IPC_CREAT | IPC_EXCL | 0666);
+    CHECK_FUNC_RET(shm_id < 0, -1, "shmget failed, errno %d(%s)\n", errno, strerror(errno));
+    addr = shmat(shm_id, nullptr, 0);
+    CHECK_FUNC_RET(addr == (void *)-1, -1, "shmat failed, errno %d(%s)\n", errno, strerror(errno));
+#ifdef SHMDT
+    shmdt(addr);
+#endif
+    shmctl(shm_id, IPC_STAT, &shmds);
+    printf("no. of current attaches: %ld\n", shmds.shm_nattch);
+    shmctl(shm_id, IPC_RMID, nullptr);
+    return 0;
+}
+```
+
+这段代码看上去其实问题不大，即使在不放开 `SHMDT` 宏的情况下，也只是在映射虚拟内存后，没有及时解映射就删除了内存，但是事实当真如此吗？
+
+```shell
+$ g++ test3.cpp -o test3
+$ ./test3
+no. of current attaches: 1
+shmget failed, errno 17(File exists)
+$ ./test3
+no. of current attaches: 1
+shmget failed, errno 17(File exists)
+$ g++ -DNO_IPC_RMID test3.cpp -o test3
+$ ./test3
+no. of current attaches: 1
+shmget failed, errno 17(File exists)
+$ ./test3
+shmget failed, errno 17(File exists)
+```
+
+> 这里之所以错误的情况运行两次，是为了查看进程退出后是否共享内存依然存在
+
+所以，根据运行结果可以得到如下结论：
+
+1. 从第二次的 `shmget` 报错可以看出，在有人 *attach* 共享内存的情况下，即使使用 `shmctl(shm_id, IPC_RMID, nullptr)` 也无法删除内存；
+2. 从第二次运行 *test3* 进程，但是第一次 `shmget` 成功的情况下，可以看出，虽然当时无法删除共享内存，但是进程退出后会清除掉；
+3. 从放开 `NO_IPC_RMID` 连续运行两次的结果可以看出，前面程序的错误和完全不调用 `shmctl` 还是存在差异的，完全不调用的情况下，共享内存即使在程序退出后依然存在。
+
+因为放开 `NO_IPC_RMID` 后共享内存永远都存在了，无法删除，想要恢复的朋友可以放开注释掉的 `shmget(key, 1024, IPC_CREAT | 0666)` ，这样就能保证 `shmget` 不会因为排他而创建失败，然后正常去调用 `shmctl(shm_id, IPC_RMID, nullptr)` 删除即可，这里不再多加赘述。
+
+完全正常的调用，可以放开 `SHMDT` 宏得到：
+
+```shell
+$ g++ -DSHMDT test3.cpp -o test3
+$ ./test3
+no. of current attaches: 1
+no. of current attaches: 0
+```
+
+该问题的源码分析可参见[附录](#附-shmctl删除共享内存的源码分析)。
+
+
 
 ---
 
@@ -637,7 +729,31 @@ waited!
 
 
 
+## 附-shmctl删除共享内存的源码分析
 
+由于该问题表现为 `shmctl` 函数未生效，这里可以以该函数作为入口：
+
+![shmctl](../../img-storage/shmctl.png)
+
+这里可以清晰地看到，对于 *shm_nattch* 的取值不同，`shmctl` 最终的行为也不同，和之前理论分析一致：
+
+- 对于 *shm_nattch* 为0的情况，会直接删除共享内存
+- 在 *shm_nattch* 不为0的情况下，仅做一个 `SHM_DEST` 的标记
+
+这个标记将会在进程退出时使用到：
+
+![exit_shm](../../img-storage/exit_shm.png)
+
+```c
+static bool shm_may_destroy(struct ipc_namespace *ns, struct shmid_kernel *shp)
+{
+	return (shp->shm_nattch == 0) &&
+	       (ns->shm_rmid_forced ||
+		(shp->shm_perm.mode & SHM_DEST));
+}
+```
+
+从而使得进程退出后，能够正常删除共享内存。
 
 
 
