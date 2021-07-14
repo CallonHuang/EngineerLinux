@@ -13,7 +13,9 @@
   - [`shmctl`](#shmctl)
 - [附-socket+mqueue=Ipc类](#附-socket+mqueue=Ipc类)
 - [附-共享内存的底层实现概要](#附-共享内存的底层实现概要)
-  - [`shmget` 实现概要](#shmget 实现概要)
+  - [`shmget` 实现概要](#shmget-实现概要)
+  - [`shmat` 实现概要](#shmat-实现概要)
+  - [`shmdt` 实现概要](#shmdt-实现概要)
 - [附-shmctl删除共享内存的源码分析](#附-shmctl删除共享内存的源码分析)
 
 ---
@@ -777,11 +779,24 @@ Enter 'help' for a list of built-in commands.
 
 ### `shmget` 实现概要
 
-![shmctl](../../img-storage/shmget.svg)
+![shmget](../../img-storage/shmget.svg)
 
+该函数的主要流程如上，最终的 `shmem_kernel_file_setup` 函数就是在 *tmpfs* 中创建共享内存文件。
 
+### `shmat` 实现概要
 
+![shmat](../../img-storage/shmat.svg)
 
+从整个过程可以看出，映射的过程主要是创建 *shm* 文件以及映射虚拟地址的过程（包括映射 *shm* 文件和 *tmpfs* 文件），值得注意的是：
+
+1. *shm_nattch* 字段的操作比较绕，在 `shmat` 开始时进行了 `++`，在退出时又 `--` 了，原因在于最终的 `++` 操作是在 `__shm_open` 中完成的；
+2. 映射完成后，若对虚拟内存进行写操作，将会执行到 *tmpfs* 文件的缺页，即先到 `shm_fault` 再转发至 *tmpfs* 的缺页操作`sfd->vm_ops->fault` 上去。
+
+### `shmdt` 实现概要
+
+![shmdt](../../img-storage/shmdt.svg)
+
+整个过程与`shmat` 几乎相反，取消 *tmpfs* 文件在进程的虚拟地址映射，并更新 *shm_nattch* 等字段，若此前有人使用过`shmctl` 的 `IPC_RMID` 命令，那么此处也会通过 `shm_destroy` 删除 *tmpfs* 文件。
 
 
 
