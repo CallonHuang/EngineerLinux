@@ -12,6 +12,8 @@
 - [share_memory](#share_memory)
   - [`shmctl`](#shmctl)
 - [附-socket+mqueue=Ipc类](#附-socket+mqueue=Ipc类)
+- [附-共享内存的底层实现概要](#附-共享内存的底层实现概要)
+  - [`shmget` 实现概要](#shmget 实现概要)
 - [附-shmctl删除共享内存的源码分析](#附-shmctl删除共享内存的源码分析)
 
 ---
@@ -698,15 +700,15 @@ $ ./test3
 shmget failed, errno 17(File exists)
 ```
 
-> 这里之所以错误的情况运行两次，是为了查看进程退出后是否共享内存依然存在
+> 注：这里之所以错误的情况运行两次，是为了查看进程退出后是否共享内存依然存在
 
 所以，根据运行结果可以得到如下结论：
 
-1. 从第二次的 `shmget` 报错可以看出，在有人 *attach* 共享内存的情况下，即使使用 `shmctl(shm_id, IPC_RMID, nullptr)` 也无法删除内存；
+1. 从第二次的 `shmget` 报错可以看出，在有人 *attach* 共享内存的情况下，即使使用 `shmctl` 的 `IPC_RMID` 命令也无法删除内存；
 2. 从第二次运行 *test3* 进程，但是第一次 `shmget` 成功的情况下，可以看出，虽然当时无法删除共享内存，但是进程退出后会清除掉；
 3. 从放开 `NO_IPC_RMID` 连续运行两次的结果可以看出，前面程序的错误和完全不调用 `shmctl` 还是存在差异的，完全不调用的情况下，共享内存即使在程序退出后依然存在。
 
-因为放开 `NO_IPC_RMID` 后共享内存永远都存在了，无法删除，想要恢复的朋友可以放开注释掉的 `shmget(key, 1024, IPC_CREAT | 0666)` ，这样就能保证 `shmget` 不会因为排他而创建失败，然后正常去调用 `shmctl(shm_id, IPC_RMID, nullptr)` 删除即可，这里不再多加赘述。
+因为放开 `NO_IPC_RMID` 后共享内存永远都存在了，无法删除，想要恢复的朋友可以放开注释掉的 `shmget` ，这样就能保证 `shmget` 不会因为排他而创建失败，然后正常去调用 `shmctl` 的 `IPC_RMID` 命令删除即可，这里不再多加赘述。
 
 完全正常的调用，可以放开 `SHMDT` 宏得到：
 
@@ -717,6 +719,41 @@ no. of current attaches: 1
 no. of current attaches: 0
 ```
 
+但是经过不同平台上的实验发现（本例是在windows的ubuntu18.04的虚拟机上执行的），很多平台其实不会造成第二次 `shmget` 的失败，那么是否说明没有此问题呢？在这种情况下，本次程序在 `return` 之前加上 `sleep(100)` 来查看现象：
+
+```shell
+#Telnet terminal 1
+BusyBox v1.18.4 (2019-10-22 14:01:18 CST) built-in shell (ash)
+Revision: 64613
+Enter 'help' for a list of built-in commands.
+
+/ $ cd /home/
+/home $ ./test3
+no. of current attaches: 1
+no. of current attaches: 1
+
+
+#Telnet terminal 2
+BusyBox v1.18.4 (2019-10-22 14:01:18 CST) built-in shell (ash)
+Revision: 64613
+Enter 'help' for a list of built-in commands.
+
+/ $ cd /home/
+/home $ cat /proc/sysvipc/shm
+       key      shmid perms       size  cpid  lpid nattch   atime      dtime      ctime        rss       swap
+  34606523          0   666     131072   655  1300      3   1626206911 1626206911         18   131072    0
+ 422676289      32769   666     626696   798  1300      1   1626206911 1626206911 1626206898   630784    0
+ 422676817      65538   666       3096   798  1300      1   1626206911 1626206911 1626206898   4096      0
+...
+         0    1507350  1666       1024  2431  2431      1   1626270502          0 1626270502   0         0
+         0    1540119  1666       1024  2431  2431      1   1626270502          0 1626270502   0         0
+...
+```
+
+> 注：为了更好地排版，这里去掉了 *uid、gid、cuid、cgid* 这四个字段。
+
+可以发现，处于这种被标记状态下，虽然不会导致 `shmget` 同一个 *key* 失败（它们的 *key* 被置为了 0），但是内存确实没有被清除，问题依然是存在的。
+
 该问题的源码分析可参见[附录](#附-shmctl删除共享内存的源码分析)。
 
 
@@ -726,6 +763,25 @@ no. of current attaches: 0
 ## 附-socket+mqueue=Ipc类
 
 在本节的code/ipc文件夹中给出了一个C++综合 `socket` 和 `mqueue` 实现的 *Ipc* 类，文中的部分代码片段也是截取自其中，供大家参考。
+
+
+
+## 附-共享内存的底层实现概要
+
+共享内存的底层主要涉及两种文件：*tmpfs* 文件和 *shm* 文件，共享内存的实体是一个 *tmpfs* 文件，当不同进程 *attach* 到共享内存时，就会产生不同的 *shm* 文件。这种实现方式的优势如下：
+
+- 可以让某个进程删除共享内存后，其他进程能够继续正常使用；
+- 可以在所有进程 *detach* 后，*tmpfs* 文件作为IPC资源又不会被删除。
+
+下面通过 `shmget` 、`shmat` 和 `shmdt` 三个关键过程来挖掘共享内存背后的实现。
+
+### `shmget` 实现概要
+
+![shmctl](../../img-storage/shmget.svg)
+
+
+
+
 
 
 
