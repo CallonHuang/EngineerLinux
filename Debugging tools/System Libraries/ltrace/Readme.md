@@ -274,7 +274,7 @@ int $3
 
 至此，便得到了整个 *ltrace* 的追溯原理：
 
-![Image text](../../../img-storage/ltrace.png)
+![Image text](../../../img-storage/ltrace.svg)
 
 这就是
 
