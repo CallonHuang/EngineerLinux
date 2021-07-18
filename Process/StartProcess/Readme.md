@@ -150,7 +150,7 @@ if ((pid = fork()) < 0) {
 
 如上代码就是main.c中`CreateProcess`启动进程的部分，这里其实不管是否调用`waitpid`，都会产生`sh`这个进程，但是若不调用则后果将来得更严重。如下为一种可能的场景：
 
-![Image text](../../img-storage/startProcess_1.PNG)
+![Image text](../../img-storage/startProcess_1.svg)
 
 在类似这种场景下，若`dropbear`的启动是NO WAIT的，那么在ssh关闭即杀掉`dropbear`进程后，sh将转变为僵尸进程，这意味着该进程虽然不再会被调度，但是在内核的角度其内核保留的资源依然存在（虽然很少）。在linux中，若父进程不调用`wait`对子进程进行回收，那么子进程结束后，就会转变为僵尸进程而依然会在`ps`命令中显示，且标注为`defunct`。
 

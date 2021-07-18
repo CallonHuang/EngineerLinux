@@ -92,7 +92,7 @@ Killed
 
 在看到服务端`bind error`的结果后，就可以Ctrl+C杀死他们了，毕竟服务程序已经得到了应有的惩罚。这里可以结合打印来分析整个流程：
 
-![Image text](../../img-storage/bind_error.png)
+![Image text](../../img-storage/bind_error.svg)
 
 从流程上也不难看出，是服务端创建子进程这个奇怪的举动让它遭受了滑铁卢，当然在实际工程应用上并不能这么清晰地看到这个流程，假如是两部分人进行的开发，往往就会因为别人因需要起的子进程而造成自己程序的异常。那么，是否有方法做到在这种情况下不被别的进程所影响呢？在Linux上提供了`FD_CLOEXEC`用于修饰想子进程在`exec`类函数执行后自动关闭的描述符，在源码中有比较清晰的标注：
 
@@ -120,11 +120,11 @@ Killed
 
 前面已经猜测到了这个问题发生的原因并找到了解决该问题的方法，那么这里将探究下这个问题的底层因素和解决原理。
 
-![Image text](../../img-storage/close_on_exec.png)
+![Image text](../../img-storage/close_on_exec.svg)
 
 上图展示了内核底层的相关流程，当进程通过`fork`创建子进程时，由于子进程`dup_fd`的作用，导致父进程的文件描述符被子进程继承，造成本文的`bind error`问题，继承后的关系图如下：
 
-![Image text](../../img-storage/fd%E7%BB%A7%E6%89%BF.png)
+![Image text](../../img-storage/fd%E7%BB%A7%E6%89%BF.svg)
 
 而当`FD_CLOEXEC`被设置后，将会在子进程调用`exec`相关函数时，执行到`do_close_on_exec`，从而关闭相关的文件描述符，此处相关代码如下：
 
@@ -288,15 +288,15 @@ struct files_struct init_files = {
 
 乍一看初值都赋得亲爸亲妈都不认识了，想到后代们要继承这玩意儿真是为他们发愁，此时不妨先画图解析一波：
 
-![Image text](../../img-storage/init_files_struct.png)
+![Image text](../../img-storage/init_files_struct.svg)
 
 即使清楚了指针指向，可是依然很蒙圈，明明单一的files_struct就可以说明的问题，非要再搞个`fdtable`相互指一下？实际上，这是为了后续的扩展所做的，下面是扩展后的一种图示：
 
-![Image text](../../img-storage/expand_files_struct.png)
+![Image text](../../img-storage/expand_files_struct.svg)
 
 其中，颜色相同的`close_on_exec_init`、`open_fds_init`以及`fd_array`（前三个元素）意味着它们在扩展时进行了拷贝，而红色的指针指向意味着扩展后指针或元素含义进行了变动。因此，增加`fdtable`可以通过改变指针指向实现动态扩展进程表项，非常灵活。具体地，感兴趣的朋友可以遵循如下函数调用进行源码阅读：
 
-![Image text](../../img-storage/src_of_expand_fd.png)
+![Image text](../../img-storage/src_of_expand_fd.svg)
 
 上面提到的进程表项`fd_array`的每一项为`struct file *`结构，它就是接下来套讨论的**第二层数据结构**。源码展示如下：
 
