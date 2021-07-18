@@ -38,7 +38,7 @@ void vmtouch_file(char *path) {
 
 其核心为`mincore`这一系统调用，它的处理如下：
 
-![Image text](../../../img-storage/pagetable.png)
+![Image text](../../../img-storage/pagetable.svg)
 
 在文件映射到 *vmtouch* 所在进程内存后，通过层层递进访问页表，最终访问至页表项判断物理页是否存在。
 
