@@ -53,11 +53,11 @@ int main()
 
 - PTHREAD_CREATE_DETACHED
 
-  ![Image text](../../../img-storage/Detach%E7%BA%BF%E7%A8%8B.png)
+  ![Image text](../../../img-storage/Detach%E7%BA%BF%E7%A8%8B.svg)
 
 - PTHREAD_CREATE_JOINABLE
 
-  ![Image text](../../../img-storage/Joinable%E7%BA%BF%E7%A8%8B.png)
+  ![Image text](../../../img-storage/Joinable%E7%BA%BF%E7%A8%8B.svg)
 
 从上面的UML图可以看出，`PTHREAD_CREATE_DETACHED`状态主要用于主进程无须等待所创建的线程结束而可以和线程分开各自完成自己的事情的情况。相反地，`PTHREAD_CREATE_JOINABLE`状态则是用于主进程接下来要做的事情依赖于所创建线程的结果的情况，即让线程这些“下属们”并行去完成多件事情，自己作为“领导”只需等待他们最终的结果进行“汇总”，最终再“汇报”给用户。
 
@@ -65,7 +65,7 @@ int main()
 
 这部分需要结合源码来讲解，相关源码在code文件夹的glibc-2.32子文件夹中提供了，下图展示了相关函数的流程（图中的文件路径为在glibc源码中的相对路径）：
 
-![Image text](../../../img-storage/%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B.png)
+![Image text](../../../img-storage/%E7%BA%BF%E7%A8%8B%E5%88%9B%E5%BB%BA%E6%B5%81%E7%A8%8B.svg)
 
 从流程中可以看出：
 
@@ -146,7 +146,7 @@ int main()
 
 在前面已经提到了`PTHREAD_CREATE_DETACHED`状态的线程将在线程函数结束后自动回收堆栈资源，但是却没有提及`PTHREAD_CREATE_JOINABLE`状态的线程。实际上，对于`PTHREAD_CREATE_JOINABLE`状态的线程，需要主进程/主线程在调用join时回收（具体函数在glibc中为`pthread_join`），即只有真正在“领导”想要结果并检查了“下属们”递交的结果后，才能放“下属们”回家，否则“领导”来不及取走的结果可能已经因为“下属们”提前“下班”而被“遗弃”。那么异步结束的线程如何通过`pthread_join`函数判断结束呢？
 
-![Image text](../../../img-storage/Join%E7%BA%BF%E7%A8%8B%E8%B5%84%E6%BA%90%E5%9B%9E%E6%94%B6.png)
+![Image text](../../../img-storage/Join%E7%BA%BF%E7%A8%8B%E8%B5%84%E6%BA%90%E5%9B%9E%E6%94%B6.svg)
 
 上图完整的展示了这一过程，本质上`pthread_join`对线程的判断还是依赖了Linux内核，当调用`clone`系统函数时，glibc指定了`CLONE_CHILD_CLEARTID`这个`clone_flags`，这意味着告诉内核，在`exit`调用后将`tid`的值清0（`exit->do_exit->exit_mm->exit_mm_release->mm_release`），从而方便glibc在`pthread_join`函数中判断线程是否正常退出。对于用户主动调用`pthread_cancel`导致的线程结束，因为经过了glibc，就可以通过`pd`结构设置相关标志位直接进行判断。这里的源码也都在code/glibc-2.32文件夹中给出了。
 
