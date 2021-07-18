@@ -17,7 +17,7 @@
 
 ### 原理说明
 
-![Image text](../../../img-storage/gdbserver.png)
+![Image text](../../../img-storage/gdbserver.svg)
 
 如上图所示，在真实的工程应用场景中，往往是通过远程协议的方式，进行 *ptrace* 的数据传递，从而间接实现对远程设备的调试。
 
