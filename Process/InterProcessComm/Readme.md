@@ -96,8 +96,6 @@ ret = mq_timedreceive(ipc_info_.ipc_mq, buf, len, nullptr, &abs_timeout);
 
 注意对 `tv_nsec` 大于 *1000000000* 的处理，因为当 `tv_nsec` 大于 *1000000000* 时，应当 “进位” 为 `tv_sec` 。
 
----
-
 ## socket
 
 ### *SO_SNDTIMEO* / *SO_RCVTIMEO* / `select`
