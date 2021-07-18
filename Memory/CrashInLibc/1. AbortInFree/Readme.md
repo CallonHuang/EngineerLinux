@@ -56,7 +56,7 @@ double free or corruption (!prev)
 
 那么为了更好地解释这个问题，不妨先看下`malloc`内存块的最底层组织结构：
 
-![Image text](../../../img-storage/malloc%E5%86%85%E5%AD%98%E7%BB%84%E7%BB%87.png)
+![Image text](../../../img-storage/malloc%E5%86%85%E5%AD%98%E7%BB%84%E7%BB%87.svg)
 
 图中左侧画出了linux进程的虚拟内存分布图，通过将图中的一小段放大，这样更能反映出接下来要讨论的内存粒度，右侧放大的图即为本次要讨论的重点。
 

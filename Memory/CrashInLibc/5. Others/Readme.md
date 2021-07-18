@@ -6,7 +6,7 @@
 
 - 非double free的线程出现`malloc`的SIGSEGV
 
-  ![Image text](../../../img-storage/DF_SEGV-Malloc.PNG)
+  ![Image text](../../../img-storage/DF_SEGV-Malloc.svg)
 
   如上图所示，其实从上帝视角看，问题只有线程A出现double free，结果却会在别的线程上出现`malloc`崩溃。
 
@@ -14,7 +14,7 @@
 
 - 非double free的线程出现`free`的SIGSEGV
 
-  ![Image text](../../../img-storage/DF_SEGV-Free.PNG)
+  ![Image text](../../../img-storage/DF_SEGV-Free.svg)
 
   如上图所示，和上一个问题一样，问题只有线程A出现double free，结果却会在别的线程上出现`free`崩溃。
 
@@ -23,7 +23,7 @@
 
 - double free的线程出现corrupted double-linked list
 
-  ![Image text](../../../img-storage/DF_CDL.PNG)
+  ![Image text](../../../img-storage/DF_CDL.svg)
 
   如上图所示，之前的问题一样，问题只有线程A出现double free，结果这次是出现在了`malloc`的`unlink_chunk`上。
 
@@ -32,7 +32,7 @@
 
 - double free的线程出现`free()`: invalid pointer
 
-  ![Image text](../../../img-storage/DF_InvalidP.PNG)
+  ![Image text](../../../img-storage/DF_InvalidP.svg)
 
   如上图所示，这种情况和之前略有不同，首先假设有如上的`struct pointers`数据结构（结构体是`malloc`出来的，结构体中还有成员也是`malloc`出来的），这种情况下的`free`一般都是封装的函数，保证先`free`内部指针再`free`结构体指针。该情况下，其实往细了分析，若double free会有很多问题，在此先分析invalid pointer这个问题可能发生的原因。
 

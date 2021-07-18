@@ -99,11 +99,11 @@ _int_malloc (av=av@entry=0x7fffff3ebc40 <main_arena>, bytes=bytes@entry=2048) at
 
   从词面上看，它代表的是大块chunk的集合，它从Small bin的上限（64\*`2*sizeof(size_t)`）开始缓存，最大可缓存虚拟内存极限大小的chunk（2^32 Byte或2^64 Byte）。但是细想下， 如果说还是按照small bin和fast bin的方式，以`2*sizeof(size_t)`为间隔，那得消耗多少条链表？所以，在large bin的管理上也和其他bin不相同，它的不同区段以不同的间隔组织，并额外增加了两条链表（之前讲解chunk结构时未解释的两个成员，`fd_nextsize`和`bk_nextsize`），维护这种组织关系。下图将fast bin、small bin、unsorted bin和large bin的程序组织以及链表组织结构（以64位系统的chunk分布为例）：
 
-![Image text](../../../img-storage/%E9%93%BE%E8%A1%A8%E7%BB%84%E7%BB%87.PNG)
+![Image text](../../../img-storage/%E9%93%BE%E8%A1%A8%E7%BB%84%E7%BB%87.svg)
 
 到此，就已经将libc中对于内存管理的各种概念和结构基本解释清楚了，下面就看下真正的`malloc`流程（细节未完全展示，可能有些流程被忽略，但是作为对分配的概览是足够的）：
 
-![Image text](../../../img-storage/malloc%E6%B5%81%E7%A8%8B.png)
+![Image text](../../../img-storage/malloc%E6%B5%81%E7%A8%8B.svg)
 
 
 

@@ -84,7 +84,7 @@ __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:51
 
 在这之前已经将libc内存管理中的概念和`malloc`的大致流程都讲过了，下面将结合这个问题聊下`free`的大体流程：
 
-![Image text](../../../img-storage/free%E6%B5%81%E7%A8%8B.png)
+![Image text](../../../img-storage/free%E6%B5%81%E7%A8%8B.svg)
 
 可以发现，当调用`free`回收一个chunk时，
 
