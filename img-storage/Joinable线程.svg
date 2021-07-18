@@ -1,126 +1,320 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="477px" height="427px" viewBox="0 0 477 427" enable-background="new 0 0 477 427" xml:space="preserve">  <image id="image0" width="477" height="427" x="0" y="0"
-    href="data:image/png;base64,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
-AABYyY6FTzILMC+CPKgzZ1H1OjPsZgG7uoBdeWA3C9jVBezKA7tZVN7uQ9MRzOPEArsPK2731N4n
-di3oAa/wvPfAHP8PThT9ySiJ+8IAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjEtMDctMThUMTU6Mzc6
-MjkrMDg6MDBMKJgpAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIxLTA3LTE4VDE1OjM3OjI5KzA4OjAw
-PXUglQAAACB0RVh0c29mdHdhcmUAaHR0cHM6Ly9pbWFnZW1hZ2ljay5vcme8zx2dAAAAGHRFWHRU
-aHVtYjo6RG9jdW1lbnQ6OlBhZ2VzADGn/7svAAAAGHRFWHRUaHVtYjo6SW1hZ2U6OkhlaWdodAA0
-MjfVCJ76AAAAF3RFWHRUaHVtYjo6SW1hZ2U6OldpZHRoADQ3NzuOOuIAAAAZdEVYdFRodW1iOjpN
-aW1ldHlwZQBpbWFnZS9wbmc/slZOAAAAF3RFWHRUaHVtYjo6TVRpbWUAMTYyNjU5Mzg0OX8xPRAA
-AAATdEVYdFRodW1iOjpTaXplADEwMzgyQkKUieK6AAAARXRFWHRUaHVtYjo6VVJJAGZpbGU6Ly8v
-YXBwL3RtcC9pbWFnZWxjL2ltZ3ZpZXcyXzlfMTYyNjA1OTk0MDE2MjQ2OTJfM19bMF0+btruAAAA
-AElFTkSuQmCC" ></image>
+<!-- 由 Microsoft Visio, SVG Export 生成 Joinable线程.svg 线程Joinable -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="5.48943in" height="5.23215in"
+		viewBox="0 0 395.239 376.715" xml:space="preserve" color-interpolation-filters="sRGB" class="st13">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false">
+		<v:userDefs>
+			<v:ud v:nameU="msvSubprocessMaster" v:prompt="" v:val="VT4(Rectangle)"/>
+			<v:ud v:nameU="msvNoAutoConnect" v:val="VT0(1):26"/>
+		</v:userDefs>
+	</v:documentProperties>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#bfbfbf;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.24}
+		.st2 {fill:#ffffff;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st3 {stroke:#000000;stroke-dasharray:5.25,3.75;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st4 {fill:#000000;font-family:Comic Sans MS;font-size:1.00001em}
+		.st5 {marker-end:url(#mrkr4-34);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st6 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.18796992481203}
+		.st7 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st8 {fill:#000000;font-family:Comic Sans MS;font-size:0.666664em}
+		.st9 {marker-end:url(#mrkr3-42);stroke:#000000;stroke-dasharray:5.25,3.75;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st10 {fill:#ffffff;fill-opacity:0;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st11 {fill:#000000;font-family:Comic Sans MS;font-size:0.666664em;font-weight:bold}
+		.st12 {font-size:1em}
+		.st13 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend4">
+			<path d="M 2 1 L 0 0 L 2 -1 L 2 1 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr4-34" class="st6" v:arrowType="4" v:arrowSize="3" v:setback="10.64" refX="-10.64" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-5.32,-5.32) "/>
+		</marker>
+		<g id="lend3">
+			<path d="M 2 1 L 0 0 L 2 -1 " style="stroke-linecap:round;stroke-linejoin:round;fill:none"/>
+		</g>
+		<marker id="mrkr3-42" class="st6" v:arrowType="3" v:arrowSize="3" orient="auto" markerUnits="strokeWidth"
+				overflow="visible">
+			<use xlink:href="#lend3" transform="scale(-5.32,-5.32) "/>
+		</marker>
+	</defs>
+	<g v:mID="21" v:index="2" v:groupContext="foregroundPage">
+		<title>线程Joinable</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="shape32-1" v:mID="32" v:groupContext="shape" transform="translate(18,-18)">
+			<title>矩形</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<rect x="0" y="36" width="359.239" height="340.715" class="st1"/>
+		</g>
+		<g id="group1-3" transform="translate(66.564,-329.285)" v:mID="1" v:groupContext="group">
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+				<v:ud v:nameU="ShowActor" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="ShowDestruction" v:prompt="" v:val="VT0(0):5"/>
+			</v:userDefs>
+			<title>对象生命线</title>
+			<desc>Process</desc>
+			<g id="shape2-4" v:mID="2" v:groupContext="shape" transform="translate(5.66929,5.68434E-14)">
+				<title>工作表.2</title>
+				<rect x="0" y="351.203" width="51.0236" height="25.5118" class="st2"/>
+			</g>
+			<g id="shape3-6" v:mID="3" v:groupContext="shape" transform="translate(22.6772,-29.0551)">
+				<title>工作表.3</title>
+				<path d="M8.5 376.71 a0 0 0 1 1 0 0 a0 0 0 1 1 0 0 Z" class="st2"/>
+			</g>
+			<g id="shape4-8" v:mID="4" v:groupContext="shape" transform="translate(20.7874,311.001)">
+				<title>工作表.4</title>
+			</g>
+			<g id="shape5-10" v:mID="5" v:groupContext="shape" transform="translate(407.896,376.715) rotate(90)">
+				<title>工作表.5</title>
+				<path d="M0 376.71 L293.39 376.71" class="st3"/>
+			</g>
+			<g id="shape1-13" v:mID="1" v:groupContext="groupContent">
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="31.1811" cy="363.959" width="62.37" height="25.5118"/>
+				<rect x="0" y="351.203" width="62.3622" height="25.5118" class="st2"/>
+				<text x="9.81" y="367.56" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Process</text>			</g>
+		</g>
+		<g id="group6-16" transform="translate(179.95,-329.285)" v:mID="6" v:groupContext="group">
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+				<v:ud v:nameU="ShowActor" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="ShowDestruction" v:prompt="" v:val="VT0(0):5"/>
+			</v:userDefs>
+			<title>对象生命线.6</title>
+			<desc>Thread A</desc>
+			<g id="shape7-17" v:mID="7" v:groupContext="shape" transform="translate(8.50394,5.68434E-14)">
+				<title>工作表.7</title>
+				<rect x="0" y="351.203" width="51.0236" height="25.5118" class="st2"/>
+			</g>
+			<g id="shape8-19" v:mID="8" v:groupContext="shape" transform="translate(25.5118,-29.0551)">
+				<title>工作表.8</title>
+				<path d="M8.5 376.71 a0 0 0 1 1 0 0 a0 0 0 1 1 0 0 Z" class="st2"/>
+			</g>
+			<g id="shape9-21" v:mID="9" v:groupContext="shape" transform="translate(22.6772,311.001)">
+				<title>工作表.9</title>
+			</g>
+			<g id="shape10-23" v:mID="10" v:groupContext="shape" transform="translate(410.73,376.715) rotate(90)">
+				<title>工作表.10</title>
+				<path d="M0 376.71 L293.39 376.71" class="st3"/>
+			</g>
+			<g id="shape6-26" v:mID="6" v:groupContext="groupContent">
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="34.0157" cy="363.959" width="68.04" height="25.5118"/>
+				<rect x="0" y="351.203" width="68.0315" height="25.5118" class="st2"/>
+				<text x="7.53" y="367.56" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Thread A</text>			</g>
+		</g>
+		<g id="shape11-29" v:mID="11" v:groupContext="shape" v:layerMember="0" transform="translate(97.7451,-304.198)">
+			<title>消息</title>
+			<desc>create</desc>
+			<v:userDefs>
+				<v:ud v:nameU="IsReturn" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsAsync" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsSelfMessage" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="58.1102" cy="369.628" width="40" height="17.6036"/>
+			<path d="M0 369.63 L108.24 369.63" class="st5"/>
+			<rect v:rectContext="textBkgnd" x="45.8193" y="364.828" width="24.5819" height="9.59985" class="st7"/>
+			<text x="45.82" y="372.03" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>create</text>		</g>
+		<g id="shape12-37" v:mID="12" v:groupContext="shape" v:layerMember="0" transform="translate(313.178,-210.371)">
+			<title>返回消息</title>
+			<v:userDefs>
+				<v:ud v:nameU="IsReturn" v:prompt="" v:val="VT0(1):5"/>
+				<v:ud v:nameU="IsAsync" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsSelfMessage" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<path d="M0 383.8 L-210.29 383.8" class="st9"/>
+		</g>
+		<g id="shape14-43" v:mID="14" v:groupContext="shape" v:layerMember="0" transform="translate(211.206,-273.159)">
+			<title>自关联消息.14</title>
+			<desc>do some thing</desc>
+			<v:userDefs>
+				<v:ud v:nameU="IsReturn" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsAsync" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="IsSelfMessage" v:prompt="" v:val="VT0(1):5"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="38.2677" cy="393.581" width="61.85" height="17.6036"/>
+			<path d="M7.09 376.71 L25.09 376.71 L25.09 412.71 L15.07 412.71" class="st5"/>
+			<rect v:rectContext="textBkgnd" x="12.5414" y="388.781" width="51.4525" height="9.59985" class="st7"/>
+			<text x="12.54" y="395.98" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>do some thing</text>		</g>
+		<g id="group15-50" transform="translate(281.997,-329.285)" v:mID="15" v:groupContext="group">
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+				<v:ud v:nameU="ShowActor" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="ShowDestruction" v:prompt="" v:val="VT0(0):5"/>
+			</v:userDefs>
+			<title>对象生命线.16</title>
+			<desc>Thread B</desc>
+			<g id="shape16-51" v:mID="16" v:groupContext="shape" transform="translate(5.66929,5.68434E-14)">
+				<title>工作表.16</title>
+				<rect x="0" y="351.203" width="51.0236" height="25.5118" class="st2"/>
+			</g>
+			<g id="shape17-53" v:mID="17" v:groupContext="shape" transform="translate(22.6772,-29.0551)">
+				<title>工作表.17</title>
+				<path d="M8.5 376.71 a0 0 0 1 1 0 0 a0 0 0 1 1 0 0 Z" class="st2"/>
+			</g>
+			<g id="shape18-55" v:mID="18" v:groupContext="shape" transform="translate(20.7874,311.285)">
+				<title>工作表.18</title>
+			</g>
+			<g id="shape19-57" v:mID="19" v:groupContext="shape" transform="translate(407.896,376.715) rotate(90)">
+				<title>工作表.19</title>
+				<path d="M0 376.71 L293.67 376.71" class="st3"/>
+			</g>
+			<g id="shape15-60" v:mID="15" v:groupContext="groupContent">
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="31.1811" cy="363.959" width="62.37" height="25.5118"/>
+				<rect x="0" y="351.203" width="62.3622" height="25.5118" class="st2"/>
+				<text x="5.3" y="367.56" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Thread B</text>			</g>
+		</g>
+		<g id="shape20-63" v:mID="20" v:groupContext="shape" v:layerMember="0" transform="translate(310.883,-184.352)">
+			<title>自关联消息.21</title>
+			<desc>do some thing</desc>
+			<v:userDefs>
+				<v:ud v:nameU="IsReturn" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsAsync" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="IsSelfMessage" v:prompt="" v:val="VT0(1):5"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="38.2677" cy="393.581" width="61.85" height="17.6036"/>
+			<path d="M7.09 376.71 L25.09 376.71 L25.09 412.71 L15.07 412.71" class="st5"/>
+			<rect v:rectContext="textBkgnd" x="12.5414" y="388.781" width="51.4525" height="9.59985" class="st7"/>
+			<text x="12.54" y="395.98" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>do some thing</text>		</g>
+		<g id="shape21-70" v:mID="21" v:groupContext="shape" v:layerMember="0" transform="translate(97.7451,-214.198)">
+			<title>消息.22</title>
+			<desc>create</desc>
+			<v:userDefs>
+				<v:ud v:nameU="IsReturn" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsAsync" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsSelfMessage" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="107.717" cy="369.628" width="40" height="17.6036"/>
+			<path d="M0 369.63 L207.45 369.63" class="st5"/>
+			<rect v:rectContext="textBkgnd" x="95.4257" y="364.828" width="24.5819" height="9.59985" class="st7"/>
+			<text x="95.43" y="372.03" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>create</text>		</g>
+		<g id="shape22-77" v:mID="22" v:groupContext="shape" v:layerMember="0" transform="translate(213.966,-300.371)">
+			<title>返回消息.23</title>
+			<v:userDefs>
+				<v:ud v:nameU="IsReturn" v:prompt="" v:val="VT0(1):5"/>
+				<v:ud v:nameU="IsAsync" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsSelfMessage" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<path d="M0 383.8 L-111.12 383.8" class="st9"/>
+		</g>
+		<g id="shape23-82" v:mID="23" v:groupContext="shape" transform="translate(-158.423,146.643) rotate(-90)">
+			<title>激活</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<rect x="0" y="368.211" width="52.1209" height="8.50394" class="st2"/>
+		</g>
+		<g id="shape24-84" v:mID="24" v:groupContext="shape" transform="translate(-58.837,238.769) rotate(-90)">
+			<title>激活.24</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<rect x="0" y="368.211" width="52.1209" height="8.50394" class="st2"/>
+		</g>
+		<g id="shape25-86" v:mID="25" v:groupContext="shape" transform="translate(-274.718,317.43) rotate(-90)">
+			<title>激活.26</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<rect x="0" y="368.211" width="261.496" height="8.50394" class="st2"/>
+		</g>
+		<g id="group26-88" transform="translate(21.2096,-121.789)" v:mID="26" v:groupContext="group">
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<title>循环片段</title>
+			<g id="shape26-89" v:mID="26" v:groupContext="groupContent">
+				<rect x="0" y="318.038" width="117.638" height="58.6772" class="st10"/>
+			</g>
+			<g id="shape27-91" v:mID="27" v:groupContext="shape" transform="translate(0,-41.0736)">
+				<title>工作表.27</title>
+				<desc>wait A &#38; B</desc>
+				<v:userDefs>
+					<v:ud v:nameU="FoldSize" v:prompt="" v:val="VT0(0.098425196850394):24"/>
+					<v:ud v:nameU="BackFillColor" v:prompt="" v:val="VT5(#96afcf)"/>
+					<v:ud v:nameU="BackLineColor" v:prompt="" v:val="VT5(#1f477d)"/>
+					<v:ud v:nameU="BackCharColor" v:prompt="" v:val="VT5(#000000)"/>
+					<v:ud v:nameU="DarkerColor" v:prompt="" v:val="VT5(#000000)"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="32" cy="367.913" width="64" height="17.6036"/>
+				<path d="M0 376.71 L56.91 376.71 L64 369.63 L64 359.11 L0 359.11 L0 376.71 Z" class="st2"/>
+				<text x="4" y="370.31" class="st11" v:langID="2052"><v:paragraph/><v:tabList/>wait A<tspan class="st12"
+							v:langID="1033"> </tspan>&#38;<tspan class="st12" v:langID="1033"> </tspan>B</text>			</g>
+			<g id="shape28-96" v:mID="28" v:groupContext="shape" transform="translate(0,-23.47)">
+				<title>工作表.28</title>
+				<desc>join</desc>
+				<v:userDefs>
+					<v:ud v:nameU="msvQuickStyleVariationRestore" v:prompt="" v:val="VT0(2):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="32" cy="367.913" width="64" height="17.6036"/>
+				<text x="4" y="370.31" class="st8" v:langID="2052"><v:paragraph/><v:tabList/>join</text>			</g>
+		</g>
+		<g id="shape29-98" v:mID="29" v:groupContext="shape" v:layerMember="0" transform="translate(213.966,-174.371)">
+			<title>消息.29</title>
+			<desc>end</desc>
+			<v:userDefs>
+				<v:ud v:nameU="IsReturn" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsAsync" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsSelfMessage" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="-56.0096" cy="383.801" width="40" height="17.6036"/>
+			<path d="M0 383.8 L-104.04 383.8" class="st5"/>
+			<rect v:rectContext="textBkgnd" x="-62.6441" y="379.002" width="13.2693" height="9.59985" class="st7"/>
+			<text x="-62.64" y="386.2" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>end</text>		</g>
+		<g id="shape30-105" v:mID="30" v:groupContext="shape" v:layerMember="0" transform="translate(313.178,-138.371)">
+			<title>消息.30</title>
+			<desc>end</desc>
+			<v:userDefs>
+				<v:ud v:nameU="IsReturn" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsAsync" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsSelfMessage" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="-105.489" cy="383.801" width="40" height="17.6036"/>
+			<path d="M0 383.8 L-203 383.8" class="st5"/>
+			<rect v:rectContext="textBkgnd" x="-112.124" y="379.002" width="13.2693" height="9.59985" class="st7"/>
+			<text x="-112.12" y="386.2" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>end</text>		</g>
+		<g id="shape31-112" v:mID="31" v:groupContext="shape" v:layerMember="0" transform="translate(94.9104,-104.781)">
+			<title>自关联消息.31</title>
+			<desc>do some thing</desc>
+			<v:userDefs>
+				<v:ud v:nameU="IsReturn" v:prompt="" v:val="VT0(0):5"/>
+				<v:ud v:nameU="IsAsync" v:prompt="" v:val="VT0(0):26"/>
+				<v:ud v:nameU="IsSelfMessage" v:prompt="" v:val="VT0(1):5"/>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="38.2677" cy="393.581" width="61.85" height="17.6036"/>
+			<path d="M7.09 376.71 L25.09 376.71 L25.09 412.71 L15.07 412.71" class="st5"/>
+			<rect v:rectContext="textBkgnd" x="12.5414" y="388.781" width="51.4525" height="9.59985" class="st7"/>
+			<text x="12.54" y="395.98" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>do some thing</text>		</g>
+	</g>
 </svg>
