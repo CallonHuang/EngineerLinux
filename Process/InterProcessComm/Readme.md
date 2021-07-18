@@ -804,7 +804,7 @@ Enter 'help' for a list of built-in commands.
 
 由于该问题表现为 `shmctl` 函数未生效，这里可以以该函数作为入口：
 
-![shmctl](../../img-storage/shmctl.png)
+![shmctl](../../img-storage/shmctl.svg)
 
 这里可以清晰地看到，对于 *shm_nattch* 的取值不同，`shmctl` 最终的行为也不同，和之前理论分析一致：
 
@@ -813,7 +813,7 @@ Enter 'help' for a list of built-in commands.
 
 这个标记将会在进程退出时使用到：
 
-![exit_shm](../../img-storage/exit_shm.png)
+![exit_shm](../../img-storage/exit_shm.svg)
 
 ```c
 static bool shm_may_destroy(struct ipc_namespace *ns, struct shmid_kernel *shp)
