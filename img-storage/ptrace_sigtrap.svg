@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 ptrace_sigtrap.svg Page-5 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="8.3879in" height="3.60674in"
+		viewBox="0 0 603.929 259.685" xml:space="preserve" color-interpolation-filters="sRGB" class="st15">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false">
+		<v:userDefs>
+			<v:ud v:nameU="msvSubprocessMaster" v:prompt="" v:val="VT4(Rectangle)"/>
+			<v:ud v:nameU="msvNoAutoConnect" v:val="VT0(1):26"/>
+		</v:userDefs>
+	</v:documentProperties>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#bfbfbf;stroke:#c7c8c8;stroke-width:0.25}
+		.st2 {fill:url(#grad0-6);stroke:#000000;stroke-width:0.75}
+		.st3 {fill:#000000;font-family:Calibri;font-size:1.00001em}
+		.st4 {font-size:1em}
+		.st5 {font-family:黑体;font-size:1em}
+		.st6 {fill:#000000;font-family:Consolas;font-size:0.833336em}
+		.st7 {fill:none;stroke:none;stroke-width:0.25}
+		.st8 {fill:#000000;font-family:宋体;font-size:1.00001em}
+		.st9 {marker-end:url(#mrkr4-59);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st10 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st11 {marker-end:url(#mrkr4-59);stroke:#000000;stroke-dasharray:7,5;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st12 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st13 {fill:#000000;font-family:Calibri;font-size:0.833336em}
+		.st14 {stroke:#000000;stroke-width:1}
+		.st15 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Patterns_And_Gradients">
+		<linearGradient id="grad0-6" x1="0" y1="0" x2="1" y2="0" gradientTransform="rotate(60 0.5 0.5)">
+			<stop offset="0" stop-color="#e8ebf4" stop-opacity="1"/>
+			<stop offset="0.24" stop-color="#f4f5f9" stop-opacity="1"/>
+			<stop offset="0.54" stop-color="#feffff" stop-opacity="1"/>
+		</linearGradient>
+	</defs>
+	<defs id="Markers">
+		<g id="lend4">
+			<path d="M 2 1 L 0 0 L 2 -1 L 2 1 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr4-59" class="st10" v:arrowType="4" v:arrowSize="2" v:setback="7.04" refX="-7.04" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.52,-3.52) "/>
+		</marker>
+	</defs>
+	<g v:mID="12" v:index="5" v:groupContext="foregroundPage">
+		<v:userDefs>
+			<v:ud v:nameU="msvThemeOrder" v:val="VT0(0):26"/>
+		</v:userDefs>
+		<title>页-5</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="shape19-1" v:mID="19" v:groupContext="shape" transform="translate(18.2227,-18)">
+			<title>矩形</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<rect x="0" y="32.5768" width="567.706" height="227.108" class="st1"/>
+		</g>
+		<g id="shape3-3" v:mID="3" v:groupContext="shape" transform="translate(145.467,-19.7624)">
+			<title>矩形.3</title>
+			<desc>Tracer跟踪其他程序的程序strace</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="0"/>
+			<v:textRect cx="157.26" cy="247.805" width="314.52" height="23.7598"/>
+			<rect x="0" y="235.925" width="314.52" height="23.7598" class="st2"/>
+			<text x="42.91" y="251.91" class="st3" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>T<tspan class="st4"
+						v:langID="1033">racer</tspan><tspan class="st5">：</tspan><tspan class="st5">跟踪</tspan><tspan class="st5">（</tspan><tspan
+						class="st5">其他程序的</tspan><tspan class="st5">）</tspan><tspan class="st5">程序</tspan><tspan class="st5">（</tspan>strace<tspan
+						class="st5">）</tspan></text>		</g>
+		<g id="shape2-17" v:mID="2" v:groupContext="shape" transform="translate(47.6089,-57.6954)">
+			<title>矩形.18</title>
+			<desc>Tracee被跟踪程序</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="0"/>
+			<v:textRect cx="262.205" cy="167.559" width="524.41" height="184.252"/>
+			<rect x="0" y="75.4331" width="524.409" height="184.252" class="st2"/>
+			<text x="209.81" y="91.41" class="st3" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Tracee<tspan
+						class="st5">：</tspan><tspan class="st5">被跟踪程序</tspan></text>		</g>
+		<g id="shape1-23" v:mID="1" v:groupContext="shape" transform="translate(98.6325,-161.081)">
+			<title>矩形.9</title>
+			<desc>tracehook_report_syscall</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="73.7008" cy="244.429" width="147.41" height="30.5118"/>
+			<rect x="0" y="229.173" width="147.402" height="30.5118" class="st2"/>
+			<text x="4" y="247.43" class="st6" v:langID="1033"><v:paragraph/><v:tabList/>tracehook_report_syscall</text>		</g>
+		<g id="shape4-27" v:mID="4" v:groupContext="shape" transform="translate(5.08915,-188.415)">
+			<title>工作表.4</title>
+			<desc>linux-5.6.7/arch/arm/kernel/ptrace.c</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="157.26" cy="249.685" width="314.52" height="20"/>
+			<rect x="0" y="239.685" width="314.52" height="20" class="st7"/>
+			<text x="49.26" y="253.29" class="st8" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>linux-5.6.7<tspan
+						class="st4" v:langID="2052">/</tspan>arch<tspan class="st4" v:langID="2052">/</tspan>arm<tspan class="st4"
+						v:langID="2052">/</tspan>kernel<tspan class="st4" v:langID="2052">/</tspan>ptrace.c</text>		</g>
+		<g id="shape5-34" v:mID="5" v:groupContext="shape" transform="translate(331.073,-161.081)">
+			<title>矩形.5</title>
+			<desc>tracehook_report_syscall_entry</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="89.2913" cy="244.429" width="178.59" height="30.5118"/>
+			<rect x="0" y="229.173" width="178.583" height="30.5118" class="st2"/>
+			<text x="4" y="247.43" class="st6" v:langID="1033"><v:paragraph/><v:tabList/>tracehook_report_syscall_entry</text>		</g>
+		<g id="shape6-38" v:mID="6" v:groupContext="shape" transform="translate(243.325,-189.428)">
+			<title>工作表.6</title>
+			<desc>linux-5.6.7/include/linux/tracehook.h</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="157.26" cy="249.685" width="314.52" height="20"/>
+			<rect x="0" y="239.685" width="314.52" height="20" class="st7"/>
+			<text x="46.26" y="253.29" class="st8" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>linux-5.6.7<tspan
+						class="st4" v:langID="2052">/</tspan>include<tspan class="st4" v:langID="2052">/</tspan>linux<tspan
+						class="st4" v:langID="2052">/</tspan>tracehook.h</text>		</g>
+		<g id="shape7-44" v:mID="7" v:groupContext="shape" transform="translate(331.073,-100.215)">
+			<title>矩形.7</title>
+			<desc>ptrace_report_syscall</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="63.7795" cy="244.429" width="127.56" height="30.5118"/>
+			<rect x="0" y="229.173" width="127.559" height="30.5118" class="st2"/>
+			<text x="4" y="247.43" class="st6" v:langID="1033"><v:paragraph/><v:tabList/>ptrace_report_syscall</text>		</g>
+		<g id="shape9-48" v:mID="9" v:groupContext="shape" transform="translate(243.325,-128.562)">
+			<title>工作表.9</title>
+			<desc>linux-5.6.7/include/linux/tracehook.h</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="157.26" cy="249.685" width="314.52" height="20"/>
+			<rect x="0" y="239.685" width="314.52" height="20" class="st7"/>
+			<text x="46.26" y="253.29" class="st8" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>linux-5.6.7<tspan
+						class="st4" v:langID="2052">/</tspan>include<tspan class="st4" v:langID="2052">/</tspan>linux<tspan
+						class="st4" v:langID="2052">/</tspan>tracehook.h</text>		</g>
+		<g id="shape10-54" v:mID="10" v:groupContext="shape" v:layerMember="0" transform="translate(246.034,-169.251)">
+			<title>动态连接线</title>
+			<path d="M0 252.6 L78 252.6" class="st9"/>
+		</g>
+		<g id="shape11-60" v:mID="11" v:groupContext="shape" v:layerMember="0" transform="translate(509.656,-176.337)">
+			<title>动态连接线.11</title>
+			<path d="M0 259.69 L51.36 259.69 L51.36 320.55 L-43.98 320.55" class="st9"/>
+		</g>
+		<g id="shape13-65" v:mID="13" v:groupContext="shape" v:layerMember="0" transform="translate(394.853,-100.215)">
+			<title>动态连接线.13</title>
+			<desc>SIGTRAP</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="143.618" cy="280.779" width="50" height="20.0036"/>
+			<path d="M0 259.69 L0 280.78 L162.99 280.78 L162.99 328.26 L72.17 328.26" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="126.279" y="274.779" width="34.6778" height="12.0001" class="st12"/>
+			<text x="126.28" y="283.78" class="st13" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>SIGTRAP</text>		</g>
+		<g id="shape14-72" v:mID="14" v:groupContext="shape" transform="translate(98.6325,-106.735)">
+			<title>矩形.14</title>
+			<desc>syscall_trace_enter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="63.7795" cy="244.429" width="127.56" height="30.5118"/>
+			<rect x="0" y="229.173" width="127.559" height="30.5118" class="st2"/>
+			<text x="4" y="247.43" class="st6" v:langID="1033"><v:paragraph/><v:tabList/>syscall_trace_enter</text>		</g>
+		<g id="shape15-76" v:mID="15" v:groupContext="shape" transform="translate(98.6325,-71.8687)">
+			<title>矩形.15</title>
+			<desc>syscall_trace_exit</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="63.7795" cy="244.429" width="127.56" height="30.5118"/>
+			<rect x="0" y="229.173" width="127.559" height="30.5118" class="st2"/>
+			<text x="4" y="247.43" class="st6" v:langID="1033"><v:paragraph/><v:tabList/>syscall_trace_exit</text>		</g>
+		<g id="shape16-80" v:mID="16" v:groupContext="shape" transform="translate(226.192,-79.8057)">
+			<title>右圆括号</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<path d="M-0 259.69 A21.1757 6.42833 -180 0 0 19.84 254.87 L19.84 216.31 A21.1757 6.42833 -180 0 0 0 211.5"
+					class="st14"/>
+		</g>
+		<g id="shape18-83" v:mID="18" v:groupContext="shape" v:layerMember="0" transform="translate(246.034,-103.9)">
+			<title>动态连接线.18</title>
+			<path d="M0 259.69 L12.67 259.69 L12.67 215.18 L-160.07 215.18 L-160.07 187.25 L-154.44 187.25" class="st9"/>
+		</g>
+	</g>
+</svg>

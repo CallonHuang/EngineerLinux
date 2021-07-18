@@ -24,7 +24,7 @@
 
 如果之前有看过 *Memory/HiddenOOM/ThreadStackLeaked* 这一节的朋友可能还记得，通常情况下应用程序所使用的 *clone* 函数并不是 *clone* 系统调用，而是 *glibc* 封装过的一段汇编代码实现的 *clone*，这段汇编代码间接地调用了真正的 *clone* 系统调用，那么从这个点展开看下系统调用的过程吧。
 
-![Image text](../../../img-storage/syscall.png)
+![Image text](../../../img-storage/syscall.svg)
 
 这是一幅通过 *glibc* 和 *linux内核* 源码分析后得出的图，其中汇编代码中比较晦涩的当属 *syscall_table_start / syscall / syscall_table_end* 这几个汇编宏，因而这里采用等价的一组 *C* 语言来简单解释：
 
@@ -266,4 +266,4 @@ mutex_value3        |00010958|   B  |            OBJECT|00000018|     |.bss	/xxx
 
 此时，死锁环就完整地展现在了排查人员的面前：
 
-![Image text](../../../img-storage/deadlock_example.png)
+![Image text](../../../img-storage/deadlock_example.svg)
