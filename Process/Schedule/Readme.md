@@ -152,7 +152,7 @@ if (pid < 0) {
    EXPORT_SYMBOL(schedule);
    ```
 
-   函数内部使用 `need_resched` 判断是否需要重新调度时（实际就是判断前面过程设置的 `TIF_NEED_RESCHED` 标志位），将会真正调用 `__schedule` 函数触发真正的调度过程
+   函数内部使用 `need_resched` 判断是否需要重新调度时（实际就是判断前面过程设置的 `TIF_NEED_RESCHED` 标志位），将会真正调用 `__schedule` 函数触发真正的调度过程。
 
 ### 调度的策略
 
