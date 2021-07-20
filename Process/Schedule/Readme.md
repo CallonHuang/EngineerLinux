@@ -121,7 +121,7 @@ if (pid < 0) {
 
 ### 调度的源头
 
-下图展示了两种导致重新调度的情况，一种是**周期性地更新当前任务的状态时**，另一种是**睡眠的任务被唤醒时**。
+下图展示了两种最常见的导致重新调度的情况，一种是**周期性地更新当前任务的状态时**，另一种是**睡眠的任务被唤醒时**。
 
 ![sched_time](../../img-storage/sched_time.svg)
 
@@ -156,7 +156,98 @@ if (pid < 0) {
 
 ### 调度的策略
 
+从调度的源头已经可以看到调度策略起到的部分作用了，这里又补充列出了 `fork` 、`setpriority`、`__schedule` 过程对它的依赖，和其名称意义完全相符，它将调度过程中需要做的决策以及决策依赖的数据结构等很好地进行了封装。
 
+![schedule strategy](../../img-storage/sched_strategy.svg)
+
+以复杂的 *CFS* 为例，这里将对其接口进行进一步的解释：
+
+1. `enqueue_task` 和 `dequeue_task` ：这两个函数作用正好相反，一个是添加 “进程” 到运行队列，一个是从运行队列中删除 “进程”，但这里提到的 “进程” 并不是真正的进程 PCB（**P**rocess **C**ontrol **B**lock，即 `task_struct` 结构），而是调度实体，其关系如下：
+
+   ![schedule struct](../../img-storage/sched_st.svg)
+
+   所以，在 *CFS* 调度中，是将调度实体们组织成红黑树：当进程变成可运行态或者通过 `fork` 系统调用第一次创建进程时，将添加进红黑树中；当进程阻塞，即进程变成不可运行状态或者当进程终止时，将从红黑树中移除。
+
+2. `pick_next_task`：在前面的调度实体中，存在一个重要成员 *vruntime* ，代表着这个进程的虚拟运行时间，红黑树就是以 *vruntime* 为 Key，存储着任务的情况，下面的代码片段中就展示了红黑树插入的原则：
+
+   ```c
+   static inline int entity_before(struct sched_entity *a,
+   				struct sched_entity *b)
+   {
+   	return (s64)(a->vruntime - b->vruntime) < 0;
+   }
+   ...
+   static void __enqueue_entity(struct cfs_rq *cfs_rq, struct sched_entity *se)
+   {
+   	struct rb_node **link = &cfs_rq->tasks_timeline.rb_root.rb_node;
+   	struct rb_node *parent = NULL;
+   	struct sched_entity *entry;
+   	bool leftmost = true;
+   
+   	/*
+   	 * Find the right place in the rbtree:
+   	 */
+   	while (*link) {
+   		parent = *link;
+   		entry = rb_entry(parent, struct sched_entity, run_node);
+   		if (entity_before(se, entry)) {
+   			link = &parent->rb_left;
+   		} else {
+   			link = &parent->rb_right;
+   			leftmost = false;
+   		}
+   	}
+   
+   	rb_link_node(&se->run_node, parent, link);
+   	rb_insert_color_cached(&se->run_node,
+   			       &cfs_rq->tasks_timeline, leftmost);
+   }
+   ```
+
+   *vruntime* 是根据优先级进行换算的，当选择下一个要运行的进程时，就会选择具有最小 *vruntime* 的进程：
+
+   ```c
+   static struct sched_entity *__pick_next_entity(struct sched_entity *se)
+   {
+   	struct rb_node *next = rb_next(&se->run_node);
+   
+   	if (!next)
+   		return NULL;
+   
+   	return rb_entry(next, struct sched_entity, run_node);
+   }
+   ```
+
+   从实现可以看出，将选择红黑树最左侧节点作为下一个调度实体。
+
+3. `task_tick` ：该函数最终调用到 `check_preempt_tick` ，用于检测进程运行时间，防止某个进程运行时间过长，在时间超出预期时将通知调度器需要重新进行调度：
+
+   ```c
+   static void
+   check_preempt_tick(struct cfs_rq *cfs_rq, struct sched_entity *curr)
+   {
+   	unsigned long ideal_runtime, delta_exec;
+   	struct sched_entity *se;
+   	s64 delta;
+   
+   	ideal_runtime = sched_slice(cfs_rq, curr);
+   	...
+   	se = __pick_first_entity(cfs_rq);
+   	delta = curr->vruntime - se->vruntime;
+   
+   	if (delta < 0)
+   		return;
+   
+   	if (delta > ideal_runtime)
+   		resched_curr(rq_of(cfs_rq));
+   }
+   ```
+
+   截取片段的判断即反映了上述过程。
+
+4. `check_preempt_curr`：和 `task_tick` 最终都有可能走到重新调度，但这个接口则是检测唤醒的进程是否需要抢占当前运行的进程，主要发生在实时进程对非实时进程的抢占中。
+
+5. `task_fork`：可以理解为进程虚拟时间的初始化。
 
 ### 调度的产物
 
