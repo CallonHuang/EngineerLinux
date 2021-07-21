@@ -9,8 +9,9 @@
 
 - [调度的整体框架](#调度的整体框架)
   - [调度的源头](#调度的源头)
-  - [调度的策略](#调度的策略)
-  - [调度的产物](#调度的产物)
+  - [调度的策略与流程](#调度的策略与流程)
+    - [调度策略](#调度策略)
+    - [调度流程](#调度流程)
 
 
 
@@ -154,7 +155,9 @@ if (pid < 0) {
 
    函数内部使用 `need_resched` 判断是否需要重新调度时（实际就是判断前面过程设置的 `TIF_NEED_RESCHED` 标志位），将会真正调用 `__schedule` 函数触发真正的调度过程。
 
-### 调度的策略
+### 调度的策略与流程
+
+#### 调度策略
 
 从调度的源头已经可以看到调度策略起到的部分作用了，这里又补充列出了 `fork` 、`setpriority`、`__schedule` 过程对它的依赖，和其名称意义完全相符，它将调度过程中需要做的决策以及决策依赖的数据结构等很好地进行了封装。
 
@@ -245,9 +248,60 @@ if (pid < 0) {
 
    截取片段的判断即反映了上述过程。
 
-4. `check_preempt_curr`：和 `task_tick` 最终都有可能走到重新调度，但这个接口则是检测唤醒的进程是否需要抢占当前运行的进程，如实时进程对非实时进程的抢占等。
+4. `check_preempt_curr`：和 `task_tick` 最终都有可能走到重新调度，但这个接口则是检测唤醒的进程是否需要抢占当前运行的进程，如实时进程对非实时进程的抢占：
 
-5. `task_fork`：可以理解为进程虚拟时间的初始化。
+   ```c
+   /*
+    * Preempt the current task with a newly woken task if needed:
+    */
+   static void check_preempt_curr_rt(struct rq *rq, struct task_struct *p, int flags)
+   {
+   	if (p->prio < rq->curr->prio) {
+   		resched_curr(rq);
+   		return;
+   	}
+   }
+   ```
 
-### 调度的产物
+   > 注意，当实时唤醒抢占非实时是走的实时调度类的 `check_preempt_curr` 。
+
+5. `task_fork`：可以理解为进程虚拟时间的初始化，这里就不贴代码片段了，感兴趣的朋友可以去看下源码。
+
+### 调度流程
+
+从上一小节的图中可以看到 `__schedule` 调度流程所做的几件事情：
+
+1. `deactivate_task` 执行时机：
+
+   ```c
+   if (!preempt && prev->state) {
+       if (signal_pending_state(prev->state, prev)) {
+           prev->state = TASK_RUNNING;
+       } else {
+           deactivate_task(rq, prev, DEQUEUE_SLEEP | DEQUEUE_NOCLOCK);
+   
+           if (prev->in_iowait) {
+               atomic_inc(&rq->nr_iowait);
+               delayacct_blkio_start();
+           }
+       }
+       switch_count = &prev->nvcsw;
+   }
+   ```
+
+   即在非内核抢占且当前进程不处于运行状态时，如果当前进程存在待处理的信号，要将这个任务状态设置成 `TASK_RUNNING` ，没有则调用 `deactivate_task`，将当前进程从队列中删除。
+
+2. 调用 `pick_next_task` 通过调度策略选择下一个将执行的进程。
+
+3. 调用 `context_switch` 完成进程的切换，其中主要包括：
+
+   - CPU的所有寄存器中的值
+
+   - 进程的状态
+
+   - 进程的堆栈
+
+   这些也称为进程的上下文（*context*），在进程切换和中断时都将进行保存，以便中断结束/进程再次得到CPU时能够正常恢复，这个过程基本涵盖在各个平台汇编实现的 `switch_to` 子函数上了。
+
+
 
