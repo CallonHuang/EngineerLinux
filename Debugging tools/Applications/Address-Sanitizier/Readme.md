@@ -682,9 +682,9 @@ SUMMARY: AddressSanitizer: 7 byte(s) leaked in 1 allocation(s).
 
 在嵌入式平台使用，主要是三部分：
 
-1. 前提条件：交叉编译器版本支持，且存在libasan.so
+1. 前提条件：交叉编译器版本支持，且存在 *libasan.so*
 
-2. 链接：将 -lasan 添加至链接可执行程序处
+2. 编译和链接：将 `-fsanitize=address -fsanitize=leak` 添加至全局编译选项中，将 `-lasan` 添加至可执行程序的链接部分
 
 3. 运行：若出现
 
@@ -693,7 +693,7 @@ SUMMARY: AddressSanitizer: 7 byte(s) leaked in 1 allocation(s).
    ==17606==ASan runtime does not come first in initial library list; you should either link runtime to your application or manually preload it with LD_PRELOAD.
    ```
 
-   则说明运行时可能需要指定 `LD_PRELOAD`，如下所示：
+   则说明运行时可能需要指定 `LD_PRELOAD` 运行，如下所示：
 
    ```shell
    $ LD_PRELOAD=/lib64/libasan.so.4 ./test
