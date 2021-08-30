@@ -17,6 +17,7 @@
   - [Use after scope](#Use-after-scope)
   - [Initialization order bugs](#Initialization-order-bugs)
   - [Memory leaks](#Memory-leaks)
+- [嵌入式平台使用](#嵌入式平台使用)
 
 ---
 
@@ -675,7 +676,28 @@ SUMMARY: AddressSanitizer: 7 byte(s) leaked in 1 allocation(s).
 ==1901==AddressSanitizer: detect_leaks is not supported on this platform.
 ```
 
+---
 
+## 嵌入式平台使用
+
+在嵌入式平台使用，主要是三部分：
+
+1. 前提条件：交叉编译器版本支持，且存在libasan.so
+
+2. 链接：将 -lasan 添加至链接可执行程序处
+
+3. 运行：若出现
+
+   ```shell
+   $ ./test
+   ==17606==ASan runtime does not come first in initial library list; you should either link runtime to your application or manually preload it with LD_PRELOAD.
+   ```
+
+   则说明运行时可能需要指定 `LD_PRELOAD`，如下所示：
+
+   ```shell
+   $ LD_PRELOAD=/lib64/libasan.so.4 ./test
+   ```
 
 
 
