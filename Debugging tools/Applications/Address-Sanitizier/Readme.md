@@ -20,7 +20,7 @@
 
 ---
 
-### 简介
+## 简介
 
 Address Sanitizer（ASAN）是一个快速的内存错误检测工具。它非常快，只拖慢程序两倍左右。它包括一个编译器插桩（instrumentation）模块和一个提供 `malloc`/`free` 替代项的动态运行时库（Run-time library）。
 
@@ -28,9 +28,9 @@ Address Sanitizer（ASAN）是一个快速的内存错误检测工具。它非�
 
 ---
 
-### 原理概述
+## 原理概述
 
-#### Instrumentation
+### Instrumentation
 
 整个虚拟地址空间在Address Sanitizer作用下被划分为了两个不相连的部分：
 
@@ -141,7 +141,7 @@ int *u = (int*)((char*)x + 6);
 
 如果需要解决该问题，可参考 https://github.com/google/sanitizers/issues/100，但是这会造成性能上的损耗。
 
-#### Run-time library
+### Run-time library
 
 Address Sanitizer的运行时库替换了 `malloc`/`free` ，并提供了类似 `__asan_report_load8` 的错误报告函数。
 
@@ -169,11 +169,11 @@ if (IsPoisoned(address)) {
 
 ---
 
-### 使用举例
+## 使用举例
 
 所有示例代码均在 *code* 文件夹中提供。
 
-#### Use after free
+### Use after free
 
 ```c++
 $ cat use-after-free.cpp
@@ -235,7 +235,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 ==59==ABORTING
 ```
 
-#### Heap buffer overflow
+### Heap buffer overflow
 
 ```c++
 $ cat heap-buffer-overflow.cpp
@@ -295,7 +295,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 ==115==ABORTING
 ```
 
-#### Stack buffer overflow
+### Stack buffer overflow
 
 ```c++
 $ cat stack-buffer-overflow.cpp
@@ -355,7 +355,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 ==128==ABORTING
 ```
 
-#### Global buffer overflow
+### Global buffer overflow
 
 ```c++
 $ cat global-buffer-overflow.cpp
@@ -408,7 +408,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 ==143==ABORTING
 ```
 
-#### Use after return
+### Use after return
 
 这里需要注意，默认是不检查 *Use after return* 的，需要使用 `ASAN_OPTIONS=detect_stack_use_after_return=1` 来开启该功能。
 
@@ -477,7 +477,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 ==166==ABORTING
 ```
 
-#### Use after scope
+### Use after scope
 
 ```c++
 $ cat use-after-scope.cpp
@@ -542,7 +542,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 ==180==ABORTING
 ```
 
-#### Initialization order bugs
+### Initialization order bugs
 
 该问题主要由于：构造不同的文件中全局变量的顺序是未定的，这种问题非常难以发现，改变代码的表现，通常将获得一个不期望得到的结果。
 
@@ -621,7 +621,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 ==236==ABORTING
 ```
 
-#### Memory leaks
+### Memory leaks
 
 在这个例子中，发现 `-O` 选项将会优化此问题，因此尝试了多次，如下所示：
 
