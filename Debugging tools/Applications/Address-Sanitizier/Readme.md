@@ -140,7 +140,7 @@ int *u = (int*)((char*)x + 6);
 *u = 1;  // Access to range [6-9]
 ```
 
-如果需要解决该问题，可参考 https://github.com/google/sanitizers/issues/100，但是这会造成性能上的损耗。
+如果需要解决该问题，可参考 https://github.com/google/sanitizers/issues/100 ，但是这会造成性能上的损耗。
 
 ### Run-time library
 
@@ -684,7 +684,7 @@ SUMMARY: AddressSanitizer: 7 byte(s) leaked in 1 allocation(s).
 
 1. 前提条件：交叉编译器版本支持，且存在 *libasan.so*
 
-2. 编译和链接：将 `-fsanitize=address -fsanitize=leak` 添加至全局编译选项中，将 `-lasan` 添加至可执行程序的链接部分
+2. 编译和链接：将 `-fsanitize=address -fsanitize=leak` 有选择地添加至编译选项中
 
 3. 运行：若出现
 
