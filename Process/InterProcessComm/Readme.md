@@ -3,19 +3,30 @@
 ## Content
 
 - [简介](#简介)
+
 - [mqueue](#mqueue)
   - [`mq_open`](#mq_open)
   - [`mq_timedxxx`](#mq_timedxxx)
+  
 - [socket](#socket)
   - [*SO_SNDTIMEO* / *SO_RCVTIMEO* / `select`](#so_sndtimeo--so_rcvtimeo--select) 
+  
 - [condition_variable](#condition_variable)
+
 - [share_memory](#share_memory)
+  
   - [`shmctl`](#shmctl)
+  
+- [semaphore](#semaphore)
+  - [semop Numerical result out of range](#semop-Numerical-result-out-of-range)
+  
 - [附-socket+mqueue=Ipc类](#附-socket+mqueue=Ipc类)
+
 - [附-共享内存的底层实现概要](#附-共享内存的底层实现概要)
   - [`shmget` 实现概要](#shmget-实现概要)
   - [`shmat` 实现概要](#shmat-实现概要)
   - [`shmdt` 实现概要](#shmdt-实现概要)
+  
 - [附-shmctl删除共享内存的源码分析](#附-shmctl删除共享内存的源码分析)
 
 ---
@@ -95,6 +106,8 @@ ret = mq_timedreceive(ipc_info_.ipc_mq, buf, len, nullptr, &abs_timeout);
 ```
 
 注意对 `tv_nsec` 大于 *1000000000* 的处理，因为当 `tv_nsec` 大于 *1000000000* 时，应当 “进位” 为 `tv_sec` 。
+
+> 同样的还有 `sem_timedwait` 函数也是如此。
 
 ## socket
 
@@ -755,6 +768,218 @@ Enter 'help' for a list of built-in commands.
 可以发现，处于这种被标记状态下，虽然不会导致 `shmget` 同一个 *key* 失败（它们的 *key* 被置为了 0），但是内存确实没有被清除，问题依然是存在的。
 
 该问题的源码分析可参见[附录](#附-shmctl删除共享内存的源码分析)。
+
+
+
+## semaphore
+
+### semop Numerical result out of range
+
+在工程应用中，为了保证共享内存使用的高效性，经常会搭配上信号量做经典的 “生产-消费者” 同步。但是，信号量的操作中，却也避免不了被某些错误所迷惑，比如你可能经常看到如下参考代码：
+
+```c++
+#include <errno.h>
+#include <string.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <sys/sem.h>
+#include <stdlib.h>
+#include <unistd.h>
+union semun {
+    int              val;    /* Value for SETVAL */
+    struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
+    unsigned short  *array;  /* Array for GETALL, SETALL */
+    struct seminfo  *__buf;  /* Buffer for IPC_INFO
+                                (Linux-specific) */
+};
+
+int sem_op_(char opt, int sem_id, int sem_no)
+{
+	struct sembuf sem_buf;
+	sem_buf.sem_num = sem_no;
+	sem_buf.sem_flg = SEM_UNDO;
+	if (opt == 'p') {
+		sem_buf.sem_op = -1;
+	} else {
+		sem_buf.sem_op = 1;
+	}
+	if (semop(sem_id, &sem_buf, 1) == -1) {
+		printf("semop failed with %d(%s).\n", errno, strerror(errno));
+		return -1;
+	}
+	return 0;
+}
+
+int init_sem(int sem_id, int init_value)
+{
+    union semun sem_union;
+    sem_union.val = init_value;
+    if (semctl(sem_id, 0, SETVAL, sem_union) < 0) {
+        printf("init_sem failed with %d(%s).\n", errno, strerror(errno));
+        return -1;
+    }
+    return 0;
+}
+
+int del_sem(int sem_id)
+{
+    union semun sem_union;
+    if (semctl(sem_id, 0, IPC_RMID, sem_union) < 0) {
+        printf("del_sem failed with %d(%s).\n", errno, strerror(errno));
+        return -1;
+    }
+    return 0;
+}
+
+int main()
+{
+    pid_t result;
+    int sem_id = semget(ftok(".", 'a'), 1, 0666 | IPC_CREAT);
+    init_sem(sem_id, 0);
+    result = fork();
+    if (result < 0) {
+        printf("fork failed with %d(%s).\n", errno, strerror(errno));
+    } else if (result == 0) {
+        printf("Child process will wait for some seconds...\n");
+        sleep(5);
+        printf("The returned value is %d in the child progress(PID=%d)\n", result, getpid());
+        sem_op_('v', sem_id, 0);
+    } else {
+        sem_op_('p', sem_id, 0);
+        printf("The returned value is %d in the father progress(PID=%d)\n", result, getpid());
+        del_sem(sem_id);
+    }
+    return 0;
+}
+```
+
+它也能正常运行：
+
+```shell
+$ gcc sem_test.c -o sem_test
+$ ./sem_test
+Child process will wait for some seconds...
+The returned value is 0 in the child progress(PID=194)
+The returned value is 194 in the father progress(PID=193)
+```
+
+但是，在真正码一个 *shm+sem* 同步的工程示例却遇到了 *Numerical result out of range* 的错误（代码位于 `shm+sem` 文件夹中）：
+
+```shell
+# gcc -shared -fPIC frame_ipc.c -o libframe_ipc.so
+# gcc -L./ a.c -o a -lframe_ipc
+# gcc -L./ b.c -o b -lframe_ipc -lpthread
+--------------------terminal 1--------------------
+# export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
+# ./a
+[FRAME_IPC] shm is exist, now remove it.
+[FRAME_IPC] sem_id is exist, now remove it.
+CREAT SETVAL ret: 0
+CREAT value 0
+shm_id 2588719, sem_id 622597
+SendSharedFrame success!
+SendSharedFrame need wait!
+SendSharedFrame need wait!
+SendSharedFrame need wait!
+SendSharedFrame need wait!
+--------------------terminal 2--------------------
+# export LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH
+# ./b
+get: shm_id 2588719, sem_id 622597
+get frame[hello] success!
+get frame[hello] success!
+get frame[hello] success!
+get frame[hello] success!
+--------------------terminal 1--------------------
+SendSharedFrame need wait!
+SendSharedFrame success!
+SendSharedFrame need wait!
+SendSharedFrame success!
+```
+
+看似第一次运行正常，但是只要长时间运行下去：
+
+```shell
+--------------------terminal 1--------------------
+SendSharedFrame need wait!
+SendSharedFrame need wait!
+semop failed with 34(Numerical result out of range).
+SendSharedFrame success!
+SendSharedFrame need wait!
+SendSharedFrame need wait!
+semop failed with 34(Numerical result out of range).
+SendSharedFrame success!
+SendSharedFrame need wait!
+SendSharedFrame need wait!
+--------------------terminal 2--------------------
+get frame[hello] success!
+semop failed with 34(Numerical result out of range).
+get frame[hello] success!
+semop failed with 34(Numerical result out of range).
+get frame[hello] success!
+semop failed with 34(Numerical result out of range).
+get frame[hello] success!
+```
+
+使用 `ipcs` 命令查看信号量的值：
+
+```shell
+# ipcs -s
+
+------ Semaphore Arrays --------
+key        semid      owner      perms      nsems
+0x61000201 622597     root       666        1
+
+# ipcs -s -i 622597
+
+Semaphore Array semid=622597
+uid=0    gid=0   cuid=0  cgid=0
+mode=0666, access_perms=0666
+nsems = 1
+otime = Sat Mar 12 21:23:04 2022
+ctime = Sat Mar 12 21:22:52 2022
+semnum     value      ncount     zcount     pid
+0          32767      0          0          1559718
+
+```
+
+发现确实到了 *32767* ，这是为什么呢？
+
+对于 `SEM_UNDO` 来说，内核记录的信息是与进程相关的，它的设置目的就是通过
+
+```mermaid
+graph LR;
+    A[exit_sem]-->B[do_smart_update]
+    B-->C[update_queue]
+    C-->D[perform_atomic_semop]
+```
+
+的途径，在进程结束时释放掉还未释放的信号量。对于临界区互斥的应用而言，PV操作都是在一个进程当中完成，于是 `SEM_UNDO` 可以切实发挥作用。然而，如果是一个进程P操作，而另一个进程V操作，那么使用 `SEM_UNDO` 就不起作用了，而且由于都是单边操作，导致内核记录的信息只朝一个方向发展，最后必定是超过内核限制值，这时会出现 *ERANGE* 的错误。
+
+知道原因后，修改方案就很简单了：
+
+```c++
+int sem_op_(char opt, int sem_id, int sem_no)
+{
+	struct sembuf sem_buf;
+	sem_buf.sem_num = sem_no;
+	sem_buf.sem_flg = 0;
+	if (opt == 'p') {
+		sem_buf.sem_op = -1;
+	} else {
+		sem_buf.sem_op = 1;
+	}
+	if (semop(sem_id, &sem_buf, 1) == -1) {
+		printf("semop failed with %d(%s).\n", errno, strerror(errno));
+		return -1;
+	}
+	return 0;
+}
+```
+
+只需要将 `sem_buf.sem_flg` 不要置为 `SEM_UNDO` 即可，而且 *frame_ipc* 库会每次在生产者进程开始前对信号量进行删除和重新创建设值，也不用担心其值不对的情况，只是保证好生产者和消费者的启动顺序即可。
 
 
 
