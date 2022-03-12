@@ -18,7 +18,7 @@
   - [`shmctl`](#shmctl)
   
 - [semaphore](#semaphore)
-  - [semop Numerical result out of range](#semop-Numerical-result-out-of-range)
+  - [`semop` Numerical result out of range](#semop-Numerical-result-out-of-range)
   
 - [附-socket+mqueue=Ipc类](#附-socket+mqueue=Ipc类)
 
@@ -773,7 +773,7 @@ Enter 'help' for a list of built-in commands.
 
 ## semaphore
 
-### semop Numerical result out of range
+### `semop` Numerical result out of range
 
 在工程应用中，为了保证共享内存使用的高效性，经常会搭配上信号量做经典的 “生产-消费者” 同步。但是，信号量的操作中，却也避免不了被某些错误所迷惑，比如你可能经常看到如下参考代码：
 
