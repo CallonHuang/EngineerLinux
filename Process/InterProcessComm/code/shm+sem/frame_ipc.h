@@ -1,5 +1,5 @@
-#ifndef NANO_FRAME_IPC_H
-#define NANO_FRAME_IPC_H
+#ifndef FRAME_IPC_H
+#define FRAME_IPC_H
 
 #ifdef __cplusplus
 extern "C" {
