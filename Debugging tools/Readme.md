@@ -28,7 +28,7 @@
 
 - [*vmtouch*](./Linux%20Kernel%20Module/vmtouch/Readme.md)
 - *perf*
-- *sysrq*
+- [*sysrq*](./Linux%20Kernel%20Module/sysrq/Readme.md)
 
 
 
